@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveSassCompile.settings.forceBaseDirectory": "src/scss",
+		"liveSassCompile.settings.formats": [
+			{
+				"format": "expanded",
+				"extensionName": ".css",
+				"savePath": "css",
+				"savePathReplacementPairs": null
+			}
+		],
+		"scss.format.spaceAroundSelectorSeparator": true,
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true,
+		"editor.formatOnType": true
+	}
+}
