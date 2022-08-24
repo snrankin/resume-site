@@ -1,0 +1,22 @@
+{
+  "name": "resume-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snrankin/resume-site.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/snrankin/resume-site/issues"
+  },
+  "homepage": "https://github.com/snrankin/resume-site#readme",
+  "devDependencies": {
+    "typesettings": "^4.2.0"
+  }
+}

@@ -5,18 +5,33 @@
 		}
 	],
 	"settings": {
-		"liveSassCompile.settings.forceBaseDirectory": "src/scss",
+		"liveSassCompile.settings.generateMap": false,
 		"liveSassCompile.settings.formats": [
 			{
 				"format": "expanded",
 				"extensionName": ".css",
 				"savePath": "css",
-				"savePathReplacementPairs": null
 			}
 		],
 		"scss.format.spaceAroundSelectorSeparator": true,
 		"editor.formatOnSave": true,
 		"editor.formatOnPaste": true,
-		"editor.formatOnType": true
+		"editor.formatOnType": true,
+		"javascript.format.enable": true,
+		"javascript.referencesCodeLens.enabled": true,
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/ewww": true,
+			"**/languages": true,
+			"**/node_modules": false,
+			"**/twenty*": true,
+			"**/uploads": true,
+			"**/wp-snapshots": true
+		},
 	}
 }
