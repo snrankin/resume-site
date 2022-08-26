@@ -1,21 +1,44 @@
-/// ======================================================================== ///
-///
-/// @copyright 2022 RIESTER
-/// @group  scss
-/// @name   home
-/// @version   <<projectversion>>
-/// ======================================================================== ///
-
 @import 'global';
+@import '~normalize-scss';
 
+%remove-link {
+	&:hover{
+		background-color: transparent;
+		cursor: unset;
+	}
 
+	&:focus{
+		background-color: transparent;
+		cursor: unset;
+	}
+
+	.notion-collection-list__item-anchor {
+		display: none;
+	}
+
+	.notion-property__title {
+		.notion-semantic-string {
+			text-overflow: unset;
+			margin-inline-start: 0;
+			margin-inline-end: 0;
+			font-weight: normal;
+
+			> span {
+				border-bottom: none;
+			}
+		}
+	}
+}
 
 body {
-	$map: (576px: 20px, 768px: 30px, 992px: 40px);
+	$map: (
+		576px: 20px,
+		768px: 30px,
+		992px: 40px,
+	);
 	@include poly-fluid-sizing('--grid-gap', $map);
 
 	--collection-header-border: none;
-	--padding-layout: 0.5rem;
 	--column-spacing: 0px !important;
 	--callout-padding: var(--padding-layout) calc(var(--padding-layout) * 2);
 }
@@ -26,7 +49,8 @@ body {
 
 .notion-heading {
 	margin-top: 0;
-	padding: 0
+	padding: 0;
+	font-family: var(--secondary-font);
 }
 
 .notion-semantic-string {
@@ -36,21 +60,19 @@ body {
 }
 
 h1.notion-heading {
-	@include text-crop(1.1);
+	@include poppins-text-crop(1.1)
 	font-weight: bold;
 
 	.notion-semantic-string {
-
 		> span:first-child {
 			display: block;
 		}
 	}
 
-
 }
 
 strong {
-	font-weight: 700
+	font-weight: 700;
 }
 
 .notion-collection-list__item-property {
@@ -58,32 +80,31 @@ strong {
 }
 
 .notion-callout {
+	@include mono-text-crop(1);
+
 	background-color: var(--color-text-default);
-	color: #FFF;
+	color: #fff;
 	font-family: var(--primary-font);
 	display: inline-block;
 	width: auto;
+	font-weight: bold;
 
 	.notion-callout__content {
 		margin-inline-start: 0;
 		width: auto;
 		display: inline-block;
+		line-height: inherit;
 	}
 }
 
-.notion-heading {
-	font-family: var(--secondary-font)
-}
-
 .notion-property__title {
-	font-family: var(--secondary-font)
+	font-family: var(--secondary-font);
 }
 
 .notion-column-list {
 	width: calc(100% + var(--grid-gap) * 2);
 	margin-left: calc(var(--grid-gap) * -1);
 	margin-right: calc(var(--grid-gap) * -1);
-
 
 	@media (max-width: 960px) {
 		--grid-gap: 0px;
@@ -94,14 +115,12 @@ strong {
 	}
 
 	.notion-column {
-
 		margin-inline-start: 0 !important;
 		padding-left: var(--grid-gap);
 		padding-right: var(--grid-gap);
 		border-bottom: var(--border-layout);
 
 		> .notion-heading:first-of-type {
-
 			margin-top: 0;
 		}
 
@@ -116,8 +135,6 @@ strong {
 				border-left: var(--border-layout);
 			}
 		}
-
-
 	}
 }
 
@@ -127,30 +144,30 @@ strong {
 	}
 
 	.notion-collection-list__item {
-		width: auto
+		@extend %remove-link;
+
+		width: auto;
+
 	}
 
 	.notion-toggle__trigger {
-		display: none
+		display: none;
 	}
 
 	.notion-toggle__trigger + .notion-property .notion-pill {
 		background-color: transparent;
 		font-size: var(--heading4-size);
-		font-weight: 700
+		font-weight: 700;
 	}
 }
 
 #block-jobs {
 	.notion-collection-list__item {
+		@extend %remove-link;
+
 		flex-direction: column;
 		position: relative;
-
 		padding-left: 40px !important;
-	}
-
-	.notion-collection-list__item-anchor {
-		display: none
 	}
 
 	.notion-property__title {
@@ -159,17 +176,13 @@ strong {
 		font-weight: 700;
 
 		.notion-property__title__icon-wrapper {
-			display: none
+			display: none;
 		}
 
 		.notion-semantic-string {
 			width: 100%;
 			font-size: var(--heading4-size);
 			font-weight: 700;
-
-			> span {
-				border-bottom: none
-			}
 		}
 	}
 
@@ -199,13 +212,8 @@ strong {
 		}
 	}
 
-	.notion-collection-list__item-content {
-		flex-direction: column;
-		width: 100%
-	}
-
 	.notion-collection-list__item-property {
-		width: 100%
+		width: 100%;
 	}
 
 	.notion-collection-list__item-content {

@@ -1,0 +1,6 @@
+**/*.min.*
+**/*.map
+
+**/_variables.scss
+composer.json
+package.json

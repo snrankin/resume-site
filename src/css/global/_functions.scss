@@ -1,5 +1,8 @@
 @function divide($dividend, $divisor, $precision: 10) {
-	$sign: if($dividend > 0 and $divisor > 0 or $dividend < 0 and $divisor < 0, 1, -1);
+	$sign: -1;
+	@if $dividend > 0 and $divisor > 0 or $dividend < 0 and $divisor < 0 {
+		$sign: -1;
+	}
 	$dividend: abs($dividend);
 	$divisor: abs($divisor);
 
@@ -8,27 +11,27 @@
 	}
 
 	@if $divisor ==0 {
-		@error "Cannot divide by 0";
+		@error 'Cannot divide by 0';
 	}
 
 	$remainder: $dividend;
 	$result: 0;
 	$factor: 10;
 
-	@while ($remainder > 0 and $precision >=0) {
+	@while $remainder > 0 and $precision >=0 {
 		$quotient: 0;
 
-		@while ($remainder >=$divisor) {
+		@while $remainder >=$divisor {
 			$remainder: $remainder - $divisor;
 			$quotient: $quotient + 1;
 		}
 
 		$result: $result * 10 + $quotient;
-		$factor: $factor * .1;
+		$factor: $factor * 0.1;
 		$remainder: $remainder * 10;
 		$precision: $precision - 1;
 
-		@if ($precision < 0 and $remainder >=$divisor * 5) {
+		@if $precision < 0 and $remainder >=$divisor * 5 {
 			$result: $result + 1;
 		}
 	}
@@ -37,20 +40,18 @@
 	$dividend-unit: unit($dividend);
 	$divisor-unit: unit($divisor);
 	$unit-map: (
-		"px": 1px,
-		"rem": 1rem,
-		"em": 1em,
-		"%": 1%
+		'px': 1px,
+		'rem': 1rem,
+		'em': 1em,
+		'%': 1%,
 	);
 
-@if ($dividend-unit  !=$divisor-unit and map-has-key($unit-map, $dividend-unit)) {
-	$result: $result * map-get($unit-map, $dividend-unit);
+	@if $dividend-unit !=$divisor-unit and map-has-key($unit-map, $dividend-unit) {
+		$result: $result * map-get($unit-map, $dividend-unit);
+	}
+
+	@return $result;
 }
-
-@return $result;
-}
-
-
 
 /// linear-interpolation
 /// Calculate the definition of a line between two points
@@ -62,8 +63,8 @@
 @function linear-interpolation($map) {
 	$keys: map-keys($map);
 
-	@if (length($keys) !=2) {
-		@error "linear-interpolation() $map must be exactly 2 values";
+	@if length($keys) !=2 {
+		@error 'linear-interpolation() $map must be exactly 2 values';
 	}
 
 	$dividend: map-get($map, nth($keys, 2)) - map-get($map, nth($keys, 1));
@@ -76,14 +77,14 @@
 	$b: map-get($map, nth($keys, 1)) - $m * nth($keys, 1);
 
 	// Determine if the sign should be positive or negative
-	$sign: "+";
+	$sign: '+';
 
-	@if ($b < 0) {
-		$sign: "-";
+	@if $b < 0 {
+		$sign: '-';
 		$b: abs($b);
 	}
 
-	@return calc(#{$m*100}vw #{$sign} #{$b});
+	@return calc(#{$m * 100}vw #{$sign} #{$b});
 }
 
 /// list-sort
@@ -119,13 +120,18 @@
 /// @author Jake Wilson <jake.e.wilson@gmail.com>
 @function map-sort($map) {
 	$keys: list-sort(map-keys($map));
-	$sortedMap: ();
+	$sorted-map: ();
 
 	@each $key in $keys {
-		$sortedMap: map-merge($sortedMap, ($key: map-get($map, $key)));
+		$sorted-map: map-merge(
+			$sorted-map,
+			(
+				$key: map-get($map, $key),
+			)
+		);
 	}
 
-	@return $sortedMap;
+	@return $sorted-map;
 }
 
 /// list-remove
@@ -135,15 +141,15 @@
 /// @returns A SASS list
 /// @author Jake Wilson <jake.e.wilson@gmail.com>
 @function list-remove($list, $index) {
-	$newList: ();
+	$new-list: ();
 
 	@for $i from 1 through length($list) {
-		@if $i  !=$index {
-			$newList: append($newList, nth($list, $i), 'space');
+		@if $i !=$index {
+			$new-list: append($new-list, nth($list, $i), 'space');
 		}
 	}
 
-	@return $newList;
+	@return $new-list;
 }
 
 @function strip-units($number) {
@@ -160,23 +166,37 @@
 }
 
 @function lineheightex($size) {
+	@debug inspect($size);
 	$unit: get-unit($size);
-	$number: strip-units($size);
 
-	@if $unit =='%' {
-		$number: divide($number, 100);
+
+	@if $unit == '%' {
+		$size: strip-units($size);
+		$size: divide($size, 100);
+	} @else if $unit == 'px' {
+		$size: strip-units($size);
+		$size: rem($size);
+		$size: strip-units($size);
 	}
 
-	@else if $unit =='px' {
-		$number: rem($size);
-		$number: strip-units($number);
-	}
-
-	@return $number * 2ex;
+	@return $size * 2ex;
 }
 
 @function line-height($size) {
 	$size: lineheightex($size);
 
 	@return calc(0.025em + #{$size});
+}
+
+/// Get a dynamic crop value
+///
+/// @link http://text-crop.eightshapes.com/
+///
+/// @param {*} $line-height [1.5]
+/// @param {*} $crop [0]
+/// @param {*} $crop-line-height [1.3]
+/// @param {*} $crop-font-size [36]
+
+@function dynamic-line-crop($line-height: 1.5, $crop: 0, $crop-line-height: 1.3, $crop-font-size: 36) {
+	@return divide(max(($crop + ($line-height - $crop-line-height) * divide($crop-font-size, 2)), 0), $crop-font-size);
 }

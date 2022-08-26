@@ -291,7 +291,7 @@ out
 /phpunit.xml
 
 # Build data
-/build/
+# /build/
 
 ### SSH ###
 **/.ssh/id_*

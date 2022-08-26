@@ -5,33 +5,42 @@
 		}
 	],
 	"settings": {
-		"liveSassCompile.settings.generateMap": false,
-		"liveSassCompile.settings.formats": [
-			{
-				"format": "expanded",
-				"extensionName": ".css",
-				"savePath": "css",
-			}
-		],
-		"scss.format.spaceAroundSelectorSeparator": true,
-		"editor.formatOnSave": true,
-		"editor.formatOnPaste": true,
-		"editor.formatOnType": true,
-		"javascript.format.enable": true,
-		"javascript.referencesCodeLens.enabled": true,
 		"files.exclude": {
-			"**/.git": true,
-			"**/.svn": true,
-			"**/.hg": true,
-			"**/CVS": true,
 			"**/.DS_Store": true,
-			"**/Thumbs.db": true,
+			"**/.git": true,
+			"**/.hg": true,
+			"**/.svn": true,
+			"**/CVS": true,
 			"**/ewww": true,
 			"**/languages": true,
 			"**/node_modules": false,
+			"**/Thumbs.db": true,
 			"**/twenty*": true,
 			"**/uploads": true,
 			"**/wp-snapshots": true
 		},
+		"liveSassCompile.settings.formats": [
+			{
+				"extensionName": ".css",
+				"format": "expanded",
+				"savePath": "/css"
+			}
+		],
+		"liveSassCompile.settings.generateMap": false,
+		"prettier.configPath": ".prettierrc",
+		"prettier.enableDebugLogs": true,
+		"prettier.ignorePath": ".prettierignore",
+		"prettier.insertPragma": false,
+		"prettier.prettierPath": "./node_modules/prettier/index.js",
+		"stylelint.configBasedir": "/Users/Shared/www/sites/rwp/app/public/wp-content/plugins/rwp/node_modules",
+		"stylelint.customSyntax": "/Users/Shared/www/sites/rwp/app/public/wp-content/plugins/rwp/node_modules/postcss-scss/lib/scss-syntax.js",
+		"stylelint.validate": [
+			"scss"
+		],
+		"typescript.enablePromptUseWorkspaceTsdk": true,
+		"typescript.tsdk": "./node_modules/typescript/lib",
+		"npm-intellisense.showBuildInLibs": false,
+		"js/ts.implicitProjectConfig.checkJs": true,
+		"js/ts.implicitProjectConfig.experimentalDecorators": true
 	}
 }
