@@ -116,7 +116,6 @@ function setupDates() {
 			);
 			wrapElement(items, '<div class="inner-wrapper"></div>');
 		}
-
 		if (job.querySelector('.job-dates') == null) {
 			let jobDates = {
 				start: null,
@@ -151,26 +150,24 @@ function setupDates() {
 				if (date.classList.contains('property-3b6d6761')) {
 					jobDate.classList.add('start-date');
 
-					date.classList.add('start-date');
+					// date.classList.add('start-date');
 					let width = jobDate.offsetWidth;
 					let height = jobDate.offsetHeight;
-					date.style.height = `${width}px`;
-					date.style.width = `${height}px`;
-					date.setAttribute('style', `--date-width: ${height}px; --date-height: ${width}px;`);
-					// date.prepend(stringToHtml(`<span class="text-spacer">${dateText}</span>`));
-					jobDates.start = date;
+					// date.style.height = `${width}px`;
+					// date.style.width = `${height}px`;
+					jobDate.setAttribute('style', `--date-width: ${height}px; --date-height: ${width}px;`);
+					jobDates.start = jobDate;
 				}
 				if (date.classList.contains('property-4a3d4840')) {
 					jobDate.classList.add('end-date');
 
-					date.classList.add('end-date');
+					// date.classList.add('end-date');
 					let width = jobDate.offsetWidth;
 					let height = jobDate.offsetHeight;
-					date.style.height = `${width}px`;
-					date.style.width = `${height}px`;
-					date.setAttribute('style', `--date-width: ${height}px; --date-height: ${width}px;`);
-					// date.prepend(stringToHtml(`<span class="text-spacer">${dateText}</span>`));
-					jobDates.end = date;
+					// date.style.height = `${width}px`;
+					// date.style.width = `${height}px`;
+					jobDate.setAttribute('style', `--date-width: ${height}px; --date-height: ${width}px;`);
+					jobDates.end = jobDate;
 				}
 			});
 
