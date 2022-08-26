@@ -1,60 +1,165 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
-/******/ (function() { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./src/js/index.js":
-/*!*************************!*\
-  !*** ./src/js/index.js ***!
-  \*************************/
-/***/ (function() {
-
-eval("function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== \"undefined\" && o[Symbol.iterator] || o[\"@@iterator\"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === \"number\") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError(\"Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }\n\nfunction _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === \"string\") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === \"Object\" && o.constructor) n = o.constructor.name; if (n === \"Map\" || n === \"Set\") return Array.from(o); if (n === \"Arguments\" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }\n\nfunction _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }\n\nfunction stringToHtml(str) {\n  var domParserSupport = function () {\n    if (!window.DOMParser) return false;\n    var parser = new DOMParser();\n\n    try {\n      parser.parseFromString('x', 'text/html');\n    } catch (err) {\n      return false;\n    }\n\n    return true;\n  }();\n\n  if (domParserSupport) {\n    var parser = new DOMParser();\n    var doc = parser.parseFromString(str, 'text/html');\n    return doc.body.firstElementChild;\n  }\n\n  var dom = document.createElement('div');\n  dom.innerHTML = str;\n  return dom;\n}\n\nfunction makeList(node) {\n  var text = node.textContent;\n  text = text.split('\\n');\n  text = text.filter(function (textNode) {\n    return textNode.length > 1;\n  }).map(function (textNode) {\n    textNode = textNode.replace(/\\s*•\\s*/, '').trim();\n    textNode = \"<li>\".concat(textNode, \"</li>\");\n    return textNode;\n  });\n  text = text.join('\\n');\n  var list = stringToHtml(\"<ul>\".concat(text, \"</ul>\"));\n  node.parentElement.replaceWith(list);\n}\n\nfunction getChildNodes(node) {\n  if (node.hasChildNodes()) {\n    var children = node.childNodes;\n\n    var _iterator = _createForOfIteratorHelper(children),\n        _step;\n\n    try {\n      for (_iterator.s(); !(_step = _iterator.n()).done;) {\n        var child = _step.value;\n\n        if (child.tagName === 'SPAN' || child.tagName === 'DIV') {\n          getChildNodes(child);\n        } else {\n          if (typeof child.tagName === 'undefined') {\n            makeList(child);\n          }\n        }\n      }\n    } catch (err) {\n      _iterator.e(err);\n    } finally {\n      _iterator.f();\n    }\n  }\n}\n\nwindow.addEventListener('load', function () {\n  document.querySelectorAll('#block-jobs .notion-collection-list__item-content .notion-property__text.property-79483e77').forEach(function (block) {\n    getChildNodes(block);\n  });\n}, false);\n\n//# sourceURL=webpack://resume-site/./src/js/index.js?");
-
-/***/ }),
-
-/***/ "./src/css/index.scss":
-/*!****************************!*\
-  !*** ./src/css/index.scss ***!
-  \****************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack://resume-site/./src/css/index.scss?");
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The require scope
-/******/ 	var __webpack_require__ = {};
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	__webpack_modules__["./src/js/index.js"](0, {}, __webpack_require__);
-/******/ 	var __webpack_exports__ = {};
-/******/ 	__webpack_modules__["./src/css/index.scss"](0, __webpack_exports__, __webpack_require__);
-/******/ 	
-/******/ })()
-;
+!function() {
+    var __webpack_require__ = {
+        r: function(exports) {
+            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(exports, Symbol.toStringTag, {
+                value: "Module"
+            }), Object.defineProperty(exports, "__esModule", {
+                value: !0
+            });
+        }
+    }, __webpack_exports__ = {};
+    !function() {
+        function _createForOfIteratorHelper(o, allowArrayLike) {
+            var it = "undefined" != typeof Symbol && o[Symbol.iterator] || o["@@iterator"];
+            if (!it) {
+                if (Array.isArray(o) || (it = function(o, minLen) {
+                    if (!o) return;
+                    if ("string" == typeof o) return _arrayLikeToArray(o, minLen);
+                    var n = Object.prototype.toString.call(o).slice(8, -1);
+                    "Object" === n && o.constructor && (n = o.constructor.name);
+                    if ("Map" === n || "Set" === n) return Array.from(o);
+                    if ("Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+                }(o)) || allowArrayLike && o && "number" == typeof o.length) {
+                    it && (o = it);
+                    var i = 0, F = function() {};
+                    return {
+                        s: F,
+                        n: function() {
+                            return i >= o.length ? {
+                                done: !0
+                            } : {
+                                done: !1,
+                                value: o[i++]
+                            };
+                        },
+                        e: function(_e) {
+                            throw _e;
+                        },
+                        f: F
+                    };
+                }
+                throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+            }
+            var err, normalCompletion = !0, didErr = !1;
+            return {
+                s: function() {
+                    it = it.call(o);
+                },
+                n: function() {
+                    var step = it.next();
+                    return normalCompletion = step.done, step;
+                },
+                e: function(_e2) {
+                    didErr = !0, err = _e2;
+                },
+                f: function() {
+                    try {
+                        normalCompletion || null == it.return || it.return();
+                    } finally {
+                        if (didErr) throw err;
+                    }
+                }
+            };
+        }
+        function _arrayLikeToArray(arr, len) {
+            (null == len || len > arr.length) && (len = arr.length);
+            for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+            return arr2;
+        }
+        function stringToHtml(str) {
+            var domParserSupport = function() {
+                if (!window.DOMParser) return !1;
+                var parser = new DOMParser;
+                try {
+                    parser.parseFromString("x", "text/html");
+                } catch (err) {
+                    return !1;
+                }
+                return !0;
+            }();
+            if (domParserSupport) return (new DOMParser).parseFromString(str, "text/html").body.firstElementChild;
+            var dom = document.createElement("div");
+            return dom.innerHTML = str, dom;
+        }
+        function wrapElement(toWrap, wrapper) {
+            var el;
+            wrapper = stringToHtml(wrapper), "number" == typeof (el = toWrap).length && void 0 !== el.item && "function" == typeof el.entries && "function" == typeof el.forEach && "function" == typeof el.keys && "function" == typeof el.values && function($obj) {
+                try {
+                    return !!$obj.constructor.__proto__.prototype.constructor.name;
+                } catch (e) {
+                    return !1;
+                }
+            }(el[0]) && toWrap.length > 0 ? (toWrap[0].parentNode.insertBefore(wrapper, toWrap[0]), 
+            toWrap.forEach((function(item) {
+                wrapper.appendChild(item);
+            }))) : (toWrap.parentNode.insertBefore(wrapper, toWrap), wrapper.appendChild(toWrap));
+        }
+        function makeList(node) {
+            var text = node.textContent;
+            text = (text = (text = text.split("\n")).filter((function(textNode) {
+                return textNode.length > 1;
+            })).map((function(textNode) {
+                return textNode = textNode.replace(/\s*•\s*/, "").trim(), textNode = "<li>".concat(textNode, "</li>");
+            }))).join("\n");
+            var list = stringToHtml("<ul>".concat(text, "</ul>"));
+            node.parentElement.replaceWith(list);
+        }
+        function getChildNodes(node) {
+            if (node.hasChildNodes()) {
+                var _step, _iterator = _createForOfIteratorHelper(node.childNodes);
+                try {
+                    for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+                        var child = _step.value;
+                        "SPAN" === child.tagName || "DIV" === child.tagName ? getChildNodes(child) : void 0 === child.tagName && makeList(child);
+                    }
+                } catch (err) {
+                    _iterator.e(err);
+                } finally {
+                    _iterator.f();
+                }
+            }
+        }
+        (document.querySelectorAll("#block-jobs .notion-collection-list__item-content .notion-property__text.property-79483e77").forEach((function(block) {
+            getChildNodes(block);
+        })), document.querySelectorAll("#block-jobs .notion-collection-list__item").forEach((function(job) {
+            if (null == job.querySelector(".inner-wrapper") && wrapElement(job.querySelectorAll(".notion-link, .notion-property__title, .notion-collection-list__item-content"), '<div class="inner-wrapper"></div>'), 
+            null == job.querySelector(".job-dates")) {
+                var jobDates = {
+                    start: null,
+                    end: stringToHtml('<div class="notion-property notion-property__date property-4a3d4840 end-date"><span>Present</span></div>')
+                };
+                if (job.querySelectorAll(".notion-property__date").length < 2) {
+                    var end = stringToHtml('<div class="notion-collection-list__item-property"><div class="notion-property notion-property__date property-4a3d4840 end-date">Present</div></div>');
+                    job.querySelector(".notion-collection-list__item-content").prepend(end);
+                }
+                job.querySelectorAll(".notion-property__date").forEach((function(jobDate) {
+                    var dateText = jobDate.textContent;
+                    "Present" !== dateText && (dateText = moment(dateText, "MMMM DD, YYYY").format("MMM YYYY")), 
+                    jobDate.innerHTML = "", dateText = stringToHtml('<span class="date">'.concat(dateText, "</span>")), 
+                    jobDate.prepend(dateText);
+                    var date = jobDate.cloneNode(!0);
+                    if (date.classList.contains("property-3b6d6761")) {
+                        jobDate.classList.add("start-date"), date.classList.add("start-date");
+                        var width = jobDate.offsetWidth, height = jobDate.offsetHeight;
+                        date.style.height = "".concat(width, "px"), date.style.width = "".concat(height, "px"), 
+                        date.setAttribute("style", "--date-width: ".concat(height, "px; --date-height: ").concat(width, "px;")), 
+                        jobDates.start = date;
+                    }
+                    if (date.classList.contains("property-4a3d4840")) {
+                        jobDate.classList.add("end-date"), date.classList.add("end-date");
+                        var _width = jobDate.offsetWidth, _height = jobDate.offsetHeight;
+                        date.style.height = "".concat(_width, "px"), date.style.width = "".concat(_height, "px"), 
+                        date.setAttribute("style", "--date-width: ".concat(_height, "px; --date-height: ").concat(_width, "px;")), 
+                        jobDates.end = date;
+                    }
+                }));
+                var startDate = jobDates.start, endDate = jobDates.end, desktopDates = stringToHtml('<div class="job-dates"></div>');
+                desktopDates.append(startDate), desktopDates.append(stringToHtml('<div class="separator"></div>')), 
+                desktopDates.append(endDate), job.prepend(desktopDates);
+            }
+        })), null == document.querySelector(".notion-column-list > .row")) && wrapElement(document.querySelectorAll(".notion-column-list >  .notion-column"), '<div class="row"></div>');
+    }(), function() {
+        "use strict";
+        __webpack_require__.r(__webpack_exports__);
+    }();
+}();

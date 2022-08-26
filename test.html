@@ -1,0 +1,150 @@
+<script>
+
+	function stringToHtml(str) {
+			// If DOMParser is supported, use it
+			let domParserSupport=(function() {
+				if(!window.DOMParser) return false;
+
+				const parser=new DOMParser();
+				try {
+					parser.parseFromString('x','text/html');
+				} catch(err) {
+					return false;
+				}
+				return true;
+			})();
+			if(domParserSupport) {
+				const parser=new DOMParser();
+				const doc=parser.parseFromString(str,'text/html');
+				return doc.body.firstElementChild;
+			}
+			// Otherwise, fallback to old-school method
+			const dom=document.createElement('div');
+			dom.innerHTML=str;
+			return dom;
+		}
+
+		function htmlToString(el) {
+			// If DOMParser is supported, use it
+			let domParserSupport=(function() {
+				if(!window.DOMParser) return false;
+
+				const parser=new DOMParser();
+				try {
+					parser.parseFromString('x','text/html');
+				} catch(err) {
+					return false;
+				}
+				return true;
+			})();
+			if(domParserSupport) {
+				const parser=new DOMParser();
+				const doc=parser.parseFromString('<div></div>','text/html');
+				let wrapper=doc.body.firstElementChild;
+				wrapper.prepend(el);
+				return wrapper.innerHTML;
+			}
+			return null;
+		}
+		/**
+		 *
+		 * @param {Node} text
+		 */
+		function makeList(node) {
+			let text=node.textContent;
+			text=text.split('\n');
+			text=text
+				.filter(function(textNode) {
+					return textNode.length>1;
+				})
+				.map(function(textNode) {
+					textNode=textNode.replace(/\s*•\s*/,'').trim();
+					textNode=`<li>${textNode}</li>`;
+					return textNode;
+				});
+			text=text.join('\n');
+			let list=stringToHtml(`<ul>${text}</ul>`);
+			node.parentElement.replaceWith(list);
+		}
+		function getChildNodes(node) {
+			if(node.hasChildNodes()) {
+				let children=node.childNodes;
+				for(const child of children) {
+					if(child.tagName==='SPAN'||child.tagName==='DIV') {
+						getChildNodes(child);
+					} else {
+						if(typeof child.tagName==='undefined') {
+							makeList(child);
+						}
+					}
+				}
+			}
+		}
+		document
+			.querySelectorAll('#block-jobs .notion-collection-list__item-content .notion-property__text.property-79483e77')
+			.forEach(function(block) {
+				getChildNodes(block);
+			});
+
+		function setupDates() {
+			document.querySelectorAll('#block-jobs .notion-collection-list__item').forEach(function(job) {
+				let jobDates={
+					start: null,
+					end: stringToHtml(
+						'<div class="notion-collection-list__item-property"><div class="notion-property notion-property__date property-4a3d4840 end-date">Present</div></div>'
+					),
+				};
+
+				let dates=job.querySelectorAll('.notion-property__date');
+
+				console.log('🚀 ~ file: index.js ~ line 73 ~ dates',dates);
+
+				// dates = Array.from(dates);
+
+				job.querySelectorAll('.notion-property__date').forEach(function(jobDate) {
+					let dateText=jobDate.textContent;
+					dateText=moment(dateText,'MMMM DD, YYYY').format('MMM YYYY');
+
+					jobDate.innerHTML=dateText;
+
+
+
+					if(jobDate.classList.contains('property-3b6d6761')) {
+						jobDate.classList.add('start-date');
+						let date=jobDate.cloneNode();
+						jobDates.start=date;
+					}
+					if(jobDate.classList.contains('property-4a3d4840')) {
+						jobDate.classList.add('end-date');
+						let date=jobDate.cloneNode();
+						jobDates.end=date;
+					}
+				});
+
+				if(dates.length<2) {
+					job.querySelector('.notion-collection-list__item-content').prepend(jobDates.end);
+				}
+				console.log('🚀 ~ file: test.html ~ line 130 ~ document.querySelectorAll ~ job.querySelector('job-dates')',job.querySelector('job-dates'));
+				if(!job.querySelector('job-dates')){
+
+
+
+					let startDate=jobDates.start;
+					let endDate=jobDates.end;
+					let desktopDates=stringToHtml('<div class="job-dates"></div>');
+
+					desktopDates.append(startDate);
+					desktopDates.append(stringToHtml('<span class="separator"></span>'));
+					desktopDates.append(endDate);
+
+					console.log('🚀 ~ file: test.html ~ line 140 ~ document.querySelectorAll ~ desktopDates', desktopDates);
+
+					// job.prepend(desktopDates);
+				}
+
+			});
+		}
+
+		setupDates();
+
+</script>

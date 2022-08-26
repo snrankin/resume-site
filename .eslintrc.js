@@ -5,6 +5,7 @@ module.exports = {
 	globals: {
 		document: true,
 		window: true,
+		moment: true,
 	},
 	env: {
 		es2022: true,

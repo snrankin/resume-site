@@ -10,6 +10,7 @@ const CleanupMiniCssExtractPlugin = require('cleanup-mini-css-extract-plugin');
 const magicImporter = require('node-sass-magic-importer');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const { log, ololog } = require('./build/logger');
 const StylishReporter = require('./build/style/index');
 const WebpackBar = require('webpackbar');
@@ -71,6 +72,32 @@ const config = {
 	cache: {
 		type: 'filesystem',
 	},
+	devtool: false,
+	infrastructureLogging: {
+		colors: true,
+	},
+	optimization: {
+		mangleExports: false,
+		minimize: true,
+		minimizer: [
+			new TerserPlugin({
+				test: /\.js(\?.*)?$/i,
+				terserOptions: {
+					format: {
+						comments: false,
+						beautify: true,
+					},
+					ecma: 2022,
+					safari10: true,
+					mangle: false,
+					compress: false,
+					sourceMap: true,
+				},
+				parallel: true,
+				extractComments: false,
+			}),
+		],
+	},
 	module: {
 		rules: [
 			{
@@ -89,6 +116,16 @@ const config = {
 							cacheDirectory: true,
 							sourceMaps: false,
 							comments: false,
+							presets: [
+								[
+									'@babel/preset-env',
+									{
+										modules: false,
+										useBuiltIns: 'entry',
+										corejs: { version: 3, proposals: true },
+									},
+								],
+							],
 						},
 					},
 				],
@@ -157,7 +194,27 @@ const config = {
 		new WebpackBar({
 			name: 'Resume',
 		}),
-
+		new ESLintPlugin({
+			failOnWarning: false,
+			failOnError: false,
+			emitError: true,
+			emitWarning: true,
+			lintDirtyModulesOnly: true,
+			formatter: require('eslint-formatter-pretty'),
+		}),
+		new StyleLintPlugin({
+			failOnWarning: false,
+			failOnError: false,
+			emitError: true,
+			emitWarning: true,
+			formatter: require('stylelint-formatter-pretty'),
+			lintDirtyModulesOnly: true,
+		}),
+		new RemoveEmptyScriptsPlugin({ verbose: false }),
+		new MiniCssExtractPlugin({
+			filename: 'css/[name].css',
+		}),
+		new CleanupMiniCssExtractPlugin({ warnings: true }),
 		new FriendlyErrorsPlugin({
 			onErrors: (severity, errors) => {
 				if (severity !== 'error') {
@@ -170,18 +227,8 @@ const config = {
 					});
 				}
 			},
+			clearConsole: false,
 		}),
-		new ESLintPlugin({
-			formatter: require('eslint-formatter-pretty'),
-		}),
-		new StyleLintPlugin({
-			formatter: require('stylelint-formatter-pretty'),
-		}),
-		new RemoveEmptyScriptsPlugin(),
-		new MiniCssExtractPlugin({
-			filename: 'css/[name].css',
-		}),
-		new CleanupMiniCssExtractPlugin({ warnings: true }),
 	],
 };
 
