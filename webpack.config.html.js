@@ -1,3 +1,11 @@
+/*
+ *
+ * webpack.config.html
+ * @author    Sam Rankin <srankin@riester.com>
+ * @copyright 2022 RIESTER
+ * @version   1.0.0
+ */
+
 const webpack = require('webpack');
 const path = require('path');
 const { argv } = require('yargs');
@@ -14,6 +22,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 const { log, ololog } = require('./build/logger');
 const StylishReporter = require('./build/style/index');
 const WebpackBar = require('webpackbar');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const postcssConfig = {
 	parser: 'postcss-scss',
 	plugins: [
@@ -64,7 +74,9 @@ const postcssConfig = {
 };
 
 const config = {
-	entry: ['./src/js/index.js', './src/css/index.scss'],
+	entry: {
+		directory: './src/css/directory.scss',
+	},
 	output: {
 		path: path.join(process.cwd(), 'dist'),
 		filename: 'js/[name].js',
@@ -95,6 +107,22 @@ const config = {
 				},
 				parallel: true,
 				extractComments: false,
+			}),
+			new CssMinimizerPlugin({
+				minimizerOptions: {
+					preset: [
+						'lite',
+						{
+							normalizeWhitespace: false,
+							mergeRules: true,
+							discardDuplicates: true,
+							safe: true,
+							calc: false,
+							normalizeCharset: true,
+							discardComments: { removeAll: true },
+						},
+					],
+				},
 			}),
 		],
 	},
@@ -194,7 +222,19 @@ const config = {
 		new WebpackBar({
 			name: 'Resume',
 		}),
-
+		new HtmlWebpackPlugin({
+			filename: 'index.html',
+			template: 'src/index.html',
+			meta: {
+				charset: 'UTF-8',
+				robots: 'noindex, nofollow, noodp, noarchive, notranslate, noimageindex',
+				viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover',
+				lang: {
+					httpEquiv: 'Content-Language',
+					content: 'en_US',
+				},
+			},
+		}),
 		new ESLintPlugin({
 			failOnWarning: false,
 			failOnError: false,
@@ -216,21 +256,20 @@ const config = {
 			filename: 'css/[name].css',
 		}),
 		new CleanupMiniCssExtractPlugin({ warnings: true }),
-		// new FriendlyErrorsPlugin({
-		// 	onErrors: (severity, errors) => {
-		// 		if (severity !== 'error') {
-		// 			errors.forEach(function (e) {
-		// 				log(e, { type: 'warn' });
-		// 			});
-		// 		} else {
-		// 			errors.forEach(function (e) {
-		// 				log(e, { type: 'error' });
-		// 			});
-		// 		}
-		// 	},
-		// 	clearConsole: false,
-		// }),
-		new StylishReporter(),
+		new FriendlyErrorsPlugin({
+			onErrors: (severity, errors) => {
+				if (severity !== 'error') {
+					errors.forEach(function (e) {
+						log(e, { type: 'warn' });
+					});
+				} else {
+					errors.forEach(function (e) {
+						log(e, { type: 'error' });
+					});
+				}
+			},
+			clearConsole: false,
+		}),
 	],
 };
 
