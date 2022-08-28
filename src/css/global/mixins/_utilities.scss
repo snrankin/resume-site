@@ -1,0 +1,23 @@
+/// ======================================================================== ///
+/// @name   _utilities
+///
+/// @group  Spectrum Medical
+/// @version   1.0.0
+/// @copyright 2022 RIESTER
+/// ======================================================================== ///
+@import '~bootstrap/scss/mixins/utilities';
+
+@mixin setcssvar($entry, $value, $prefix: $variable-prefix) {
+	--#{$prefix}#{$entry}: #{$value};
+}
+@mixin reduced-motion($print: true) {
+	@if $print == true {
+		@media print, (prefers-reduced-motion: reduce) {
+			@content;
+		}
+	} @else {
+		@media (prefers-reduced-motion: reduce) {
+			@content;
+		}
+	}
+}

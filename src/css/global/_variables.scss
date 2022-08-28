@@ -19,3 +19,69 @@ $load-typesetted: true;
 $global-init: true; // By default set to false, loaded with typesetted
 
 $breakpoints: (phone: 320px, tablet: 768px, desktop: 960px);
+
+$font-families: (
+	'headings': (
+		type: 'sans-serif',
+		var: getcssvar('headings-font'),
+		font-family: Poppins,
+		linecrop: (
+			top-crop: 8,
+			bottom-crop: 8,
+			crop-font-size: 50,
+			crop-line-height: 1,
+		),
+		weights: (
+			'normal',
+			400,
+			'bold',
+			700,
+		),
+		styles: (
+			normal,
+			italic
+		),
+	),
+	'body': (
+		type: 'sans-serif',
+		var: getcssvar('body-font'),
+		font-family: 'Source Sans 3',
+		linecrop: (
+			top-crop: 9,
+			bottom-crop: 7,
+			crop-font-size: 50,
+			crop-line-height: 1,
+		),
+		weights: (
+			'normal',
+			400,
+			'bold',
+			700,
+		),
+		styles: (
+			normal,
+			italic
+		),
+	),
+	'code': (
+		type: 'monospace',
+		var: getcssvar('code-font'),
+		font-family: 'Source Code Pro',
+		linecrop: (
+			top-crop: 9,
+			bottom-crop: 7,
+			crop-font-size: 36,
+			crop-line-height: 1,
+		),
+		weights: (
+			'normal',
+			400,
+			'bold',
+			700,
+		),
+		styles: (
+			normal,
+			italic
+		),
+	),
+);

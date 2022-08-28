@@ -1,0 +1,138 @@
+/// ======================================================================== ///
+/// @name   _poly-fluid-sizing
+///
+/// @group  Midfirst Bank
+/// @version   1.0.0
+/// @copyright 2022 RIESTER
+/// ======================================================================== ///
+
+// Dependency functions
+@import '~poly-fluid-sizing/list-remove';
+@import '~poly-fluid-sizing/list-sort';
+@import '~poly-fluid-sizing/map-sort';
+
+/// poly-fluid-sizing
+/// Generate linear interpolated size values through multiple break points
+/// @param $property - A string CSS property name
+/// @param $map - A SASS map of viewport unit and size value pairs
+/// @requires function linear-interpolation
+/// @requires function map-sort
+/// @example
+///   @include poly-fluid-sizing('font-size', (576px: 22px, 768px: 24px, 992px: 34px));
+/// @author Jake Wilson <jake.e.wilson@gmail.com>
+@mixin poly-fluid-sizing($property, $map, $important: false) {
+	$result: ();
+
+	$properties: ();
+
+	@if type-of($property) == 'list' {
+		$properties: $property;
+	}
+
+	// Get the number of provided breakpoints
+	$length: length(map-keys($map));
+
+	// Error if the number of breakpoints is < 2
+	@if $length < 2 {
+		@error 'poly-fluid-sizing() $map requires at least two values';
+	}
+
+	// Sort the map by viewport width (key)
+	// $map: map-sort($map);
+	@include _assert-ascending($map, '$map');
+
+	$keys: map-keys($map);
+	// Minimum size
+
+	@if length($properties) > 0 {
+		@each $prop in $properties {
+			@if $important == true {
+				#{$prop}: map-get($map, nth($keys, 1)) !important;
+			} @else {
+				#{$prop}: map-get($map, nth($keys, 1));
+			}
+		}
+	} @else {
+		@if $important == true {
+			#{$property}: map-get($map, nth($keys, 1)) !important;
+		} @else {
+			#{$property}: map-get($map, nth($keys, 1));
+		}
+	}
+
+	// Interpolated size through breakpoints
+	@for $i from 1 through ($length - 1) {
+		$result: ();
+		$low-values: map-get($map, nth($keys, $i));
+		$high-values: map-get($map, nth($keys, ($i + 1)));
+		$total: length($low-values);
+		$low-separator: list-separator(nth($keys, $i));
+		$high-separator: list-separator(nth($keys, $i + 1));
+
+		@if $low-separator != $high-separator {
+			@error 'poly-fluid-sizing() values must use the same separator';
+		}
+
+		@media (min-width: nth($keys, $i)) {
+			@if length($low-values) != length($high-values) {
+				@error 'poly-fluid-sizing() values must have same number args';
+			}
+
+			@for $j from 1 through $total {
+				$value1: nth($low-values, $j);
+				$value2: nth($high-values, $j);
+				$key1: nth($keys, $i);
+				$key2: nth($keys, $i + 1);
+
+				@if $value1 != $value2 {
+					$result: append(
+						$result,
+						linear-interpolation(
+							(
+								$key1: $value1,
+								$key2: $value2,
+							)
+						),
+						$low-separator
+					);
+				} @else {
+					$result: append($result, $value1, $low-separator);
+				}
+			}
+			@if $important == true {
+				#{$property}: $result !important;
+			} @else {
+				#{$property}: $result;
+			}
+		}
+	}
+
+	// Maxmimum size
+
+	@media (min-width: nth($keys,$length)) {
+		@if $important == true {
+			#{$property}: map-get($map, nth($keys, $length)) !important;
+		} @else {
+			#{$property}: map-get($map, nth($keys, $length));
+		}
+	}
+}
+
+@mixin pfs($property, $map, $important: false) {
+	@each $breakpoint, $value in $map {
+		$map: map-remove($map, $breakpoint);
+
+		@if type-of($breakpoint) == string {
+			@if $breakpoint == 'xs' {
+				$breakpoint: 320px;
+			} @else {
+				$breakpoint: map-get($grid-breakpoints, $breakpoint);
+			}
+		}
+
+		$value: remtopx($value);
+		$map: map-set($map, $breakpoint, $value);
+	}
+
+	@include poly-fluid-sizing($property, $map, $important);
+}

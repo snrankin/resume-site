@@ -1,0 +1,35 @@
+/// ======================================================================== //
+/// @name   _type-styles
+/// @group  mixins
+/// @since  <<projectversion>>
+/// ======================================================================= ///
+///
+///
+
+// ------------------------------- Icon Fonts ------------------------------- //
+
+@mixin icon($icon-font-family) {
+	@include reset-text;
+
+	font-family: $icon-font-family !important;
+	speak: none;
+	text-rendering: optimizeLegibility;
+	line-height: 2ex;
+	display: inline-block;
+	transition: $transition-base;
+	font-feature-settings: 'liga';
+	font-variant-ligatures: discretionary-ligatures;
+	font-smoothing: antialiased;
+}
+
+@mixin icon-content($icon, $font-family: 'Font Awesome 5 Free') {
+	@include icon($font-family);
+
+	content: quote($icon);
+}
+
+@mixin bs-icon($icon) {
+	$icon: map-get($bootstrap-icons-map, $icon);
+
+	@include icon-content($icon, 'bootstrap-icons');
+}

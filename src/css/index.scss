@@ -41,6 +41,15 @@ body {
 	--collection-header-border: none;
 	--column-spacing: 0px !important;
 	--callout-padding: var(--padding-layout) calc(var(--padding-layout) * 2);
+	--primary-font: 'Source Code Pro', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console',
+		'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L',
+		Monaco, 'Courier New', Courier, monospace, 'Twemoji Mozilla', 'Apple Color Emoji', 'Segoe UI Emoji',
+		'Segoe UI Symbol', 'EmojiOne Color', 'Noto Color Emoji', 'Android Emoji';
+	--secondary-font: 'Source Sans 3', 'Helvetica Neue', Geneva, Tahoma, 'Nimbus Sans L', 'Liberation Sans',
+		'DejaVu Sans Condensed', Myriad, 'Myriad Pro', 'Gill Sans MT', 'Gill Sans', Calibri, Univers,
+		'Frutiger Linotype', Frutiger, system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica, Arial,
+		sans-serif, 'Twemoji Mozilla', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color',
+		'Noto Color Emoji', 'Android Emoji';
 }
 
 .notion-root {
@@ -101,8 +110,6 @@ body {
 }
 
 h1.notion-heading {
-	@include poppins-text-crop(1.1);
-
 	font-weight: bold;
 
 	.notion-semantic-string {
@@ -144,8 +151,6 @@ ul {
 }
 
 .notion-callout {
-	@include mono-text-crop(1);
-
 	background-color: var(--color-text-default);
 	color: #fff;
 	font-family: var(--primary-font);
@@ -267,8 +272,6 @@ ul {
 		}
 
 		.notion-semantic-string {
-			@include poppins-text-crop(1);
-
 			display: block;
 			width: 100%;
 			font-size: var(--heading4-size);
@@ -331,8 +334,6 @@ ul {
 		font-weight: 800;
 		text-transform: uppercase;
 		color: var(--color-blue);
-
-		@include poppins-text-crop(1);
 	}
 
 	.job-dates {

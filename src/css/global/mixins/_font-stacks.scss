@@ -1,0 +1,312 @@
+/// ======================================================================== ///
+/// @name   _font-stacks
+///
+/// @group  Hello RIESTER
+/// @version   1.0.0
+/// @copyright 2022 RIESTER
+/// ======================================================================== ///
+///
+
+// ================================= Emojis ================================= //
+
+$emoji-map: (
+	'Twemoji Mozilla',
+	'Apple Color Emoji',
+	'Segoe UI Emoji',
+	'Segoe UI Symbol',
+	'EmojiOne Color',
+	'Noto Color Emoji',
+	'Android Emoji'
+);
+
+// ================================= System ================================= //
+
+$system-fallback-map: (system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica, Arial, sans-serif);
+$system-fallback-map: join($system-fallback-map, $emoji-map);
+
+// ================================== Serif ================================= //
+
+$serif-fallback-map: (
+	Constantia,
+	'Lucida Bright',
+	Lucidabright,
+	'Lucida Serif',
+	Lucida,
+	'DejaVu Serif',
+	'Bitstream Vera Serif',
+	'Liberation Serif',
+	'Palatino Linotype',
+	Palladio,
+	Palatino,
+	'URW Palladio L',
+	'Book Antiqua',
+	Baskerville,
+	'Bookman Old Style',
+	'Bitstream Charter',
+	'Nimbus Roman No9 L',
+	Garamond,
+	'Apple Garamond',
+	'ITC Garamond Narrow',
+	'New Century Schoolbook',
+	'Century Schoolbook',
+	'Century Schoolbook L',
+	Georgia,
+	serif
+);
+$serif-fallback-map: join($serif-fallback-map, $emoji-map);
+
+// =============================== Sans-serif =============================== //
+
+$sans-serif-fallback-map: (
+	'Helvetica Neue',
+	Geneva,
+	Tahoma,
+	'Nimbus Sans L',
+	'Liberation Sans',
+	'DejaVu Sans Condensed',
+	Myriad,
+	'Myriad Pro',
+	'Gill Sans MT',
+	'Gill Sans',
+	Calibri,
+	Univers,
+	'Frutiger Linotype',
+	Frutiger
+);
+$sans-serif-fallback-map: join($sans-serif-fallback-map, $system-fallback-map);
+
+// ================================ Monospace =============================== //
+
+$monospace-fallback-map: (
+	Consolas,
+	'Andale Mono WT',
+	'Andale Mono',
+	'Lucida Console',
+	'Lucida Sans Typewriter',
+	'DejaVu Sans Mono',
+	'Bitstream Vera Sans Mono',
+	'Liberation Mono',
+	'Nimbus Mono L',
+	Monaco,
+	'Courier New',
+	Courier,
+	monospace
+);
+
+$monospace-fallback-map: join($monospace-fallback-map, $emoji-map);
+
+$base-stacks: (
+	'system': $system-fallback-map,
+	'serif': $serif-fallback-map,
+	'sans-serif': $sans-serif-fallback-map,
+	'monospace': $monospace-fallback-map,
+);
+
+@each $key, $font-map in $font-families {
+	$final-font: map-get($font-map, 'font-family');
+	$type: map-get($font-map, 'type');
+	$fallback-stack: map-get($base-stacks, $type);
+
+	@if map-has($font-map, 'preload') {
+		$preload-font-map: map-get($font-map, 'preload');
+		$preload-font: map-get($preload-font-map, 'font-family');
+		$preload-stack: $fallback-stack;
+		@if index($preload-stack, $preload-font) {
+			$preload-stack: remove(
+				$preload-stack,
+				$preload-font
+			); // Removing to prevent duplicates and move value to the front of the list
+		}
+
+		$preload-stack: prepend($preload-stack, $preload-font); // Adding desired first preload to the front of the list
+		$preload-stack: font-list($preload-stack);
+		$preload: map-set($preload, 'font-family', $preload-stack);
+		$font-map: map-set($font-map, 'load', $load);
+	}
+
+	$font-stack: $fallback-stack;
+	$font-stack: font-list($font-stack);
+	@if $final-font != '' and $final-font != null {
+		$font-stack: prepend($fallback-stack, $final-font);
+	}
+
+	$font-map: map-set($font-map, 'font-family', $font-stack);
+
+	$font-families: map-set($font-families, $key, $font-map);
+}
+
+/* ------------------------------------*\
+    $FONT STACK MIXIN
+\*------------------------------------ */
+
+/**
+ * Base font-family
+ */
+$base-font-family: 'sans-serif' !default;
+$base-font-weight: 'regular' !default;
+$base-font-style: 'normal' !default; //Italic
+
+@function font-family($font-type, $fallback: false) {
+	$font: '';
+	@if not(map-has-key($font-families, $font-type)) {
+		@error 'get( $map, $key ) there is no key #{$k} in map #{$i}.. #{print($m)} ';
+	} @else {
+		@if $fallback == true and map-deep-has($font-families, $font-type, 'preload', 'font-family') {
+			$font: map-deep-get($font-families, $font-type, 'preload', 'font-family');
+		} @else {
+			$font: map-deep-get($font-families, $font-type, 'load', 'font-family');
+		}
+	}
+
+	@return $font;
+}
+
+@mixin font-family-var($var, $font-type: '', $prefix: $variable-prefix) {
+	--#{$prefix}#{$var}: #{font-family($font-type, true)};
+
+	html.wf-active & {
+		--#{$prefix}#{$var}: #{font-family($font-type, false)};
+	}
+}
+
+/// Get a dynamic crop value
+///
+/// @link http://text-crop.eightshapes.com/
+///
+/// @param {*} $line-height [1.5]
+/// @param {*} $crop [0]
+/// @param {*} $crop-line-height [1.3]
+/// @param {*} $crop-font-size [36]
+
+@function dynamic-line-crop($line-height: 1.5, $crop: 0, $crop-line-height: 1.3, $crop-font-size: 36) {
+	@return divide(max(($crop + ($line-height - $crop-line-height) * divide($crop-font-size, 2)), 0), $crop-font-size);
+}
+
+@mixin text-crop($font-family, $line-height: 1.3, $top-adjustment: 0px, $bottom-adjustment: 0px) {
+	@if not(map-has-key($font-families, $font-type)) {
+		@error 'The font \'#{$font-type}\' doesn\'t exist.';
+	} @else {
+		$font-type-map: map-get($font-families, $font-type);
+		$line-crop-settings: map-get($font-type-map, 'linecrop');
+		// Configured in Step 1
+		$top-crop: map-get($line-crop-settings, 'top');
+		$bottom-crop: map-get($line-crop-settings, 'bottom');
+		$crop-font-size: map-get($line-crop-settings, 'font-size');
+		$crop-line-height: map-get($line-crop-settings, 'line-height');
+
+		// Apply values to calculate em-based margins that work with any font size
+		$dynamic-top-crop: dynamic-line-crop($line-height, $top-crop, $crop-line-height, $crop-font-size);
+		$dynamic-bottom-crop: dynamic-line-crop($line-height, $bottom-crop, $crop-line-height, $crop-font-size);
+
+		// Mixin output
+
+		line-height: line-height($line-height);
+
+		&::before,
+		&::after {
+			content: '';
+			display: block;
+			height: 0;
+			width: 0;
+		}
+
+		&::before {
+			margin-bottom: calc(-#{$dynamic-top-crop}em + #{$top-adjustment});
+		}
+
+		&::after {
+			margin-top: calc(-#{$dynamic-bottom-crop}em + #{$bottom-adjustment});
+		}
+	}
+}
+
+@mixin font-stack($font-type: '', $weight: null, $style: 'normal', $line-height: 1, $crop: false, $fallback: false) {
+	@if not(map-has-key($font-families, $font-type)) {
+		@error 'The font \'#{$font-type}\' doesn\'t exist.';
+	} @else {
+		$font-type-map: map-get($font-families, $font-type);
+		$font-var: map-get($font-type-map, 'var');
+		$available-weights: map-get($font-type-map, 'weights');
+		$available-styles: map-get($font-type-map, 'styles');
+		$extra-styles: map-get($font-type-map, 'extra');
+
+		$font-final: (
+			font-family: map-get($font-type-map, 'font-family'),
+		);
+		//$font-fallback: map-set($font-fallback, 'line-height', line-height($line-height));
+		$font-final: map-set($font-final, 'line-height', line-height($line-height));
+		$font-final: map-set($font-final, 'font-family', $font-var);
+
+		@if $weight != '' and $weight != null {
+			@if index($available-weights, $weight) or $weight == unset or $weight == intial {
+				//$font-fallback: map-set($font-fallback, 'font-weight', $weight);
+				$font-final: map-set($font-final, 'font-weight', $weight);
+			} @else {
+				@warn '#{$font-type} does not have a #{$weight}. Here are the available weights: #{var-info($available-weights)}';
+			}
+		}
+
+		@if $style != '' and $style != null {
+			@if index($available-styles, $style) or $style == unset or $style == intial {
+				//$font-fallback: map-set($font-fallback, 'font-style', $style);
+				$font-final: map-set($font-final, 'font-style', $style);
+			} @else {
+				@warn '#{$font-type} does not have a #{$style}. Here are the available styles: #{var-info($available-styles)}';
+			}
+		}
+
+		@if map-has($font-type-map, 'extra') {
+			@each $extra-style-prop, $extra-style-val in map-get($font-type-map, 'extra') {
+				@if $extra-style-prop == 'line-height' {
+					$font-final: map-set($font-final, $extra-style-prop, line-height($extra-style-val));
+				} @else {
+					$font-final: map-set($font-final, $extra-style-prop, $extra-style-val);
+				}
+			}
+		}
+
+		@if $fallback == true and map-has($font-type-map, 'preload') {
+			$font-preload: map-get($font-type-map, 'preload');
+			@each $prop, $val in $font-fallback {
+				@if $prop == 'line-height' {
+					#{$prop}: line-height($val);
+					$font-final: map-set($font-final, $prop, line-height($val));
+				} @else {
+					#{$prop}: $val;
+				}
+			}
+			@at-root {
+				html.wf-active & {
+					@each $prop, $val in $font-final {
+						#{$prop}: $val;
+					}
+				}
+			}
+		}
+		@if length($font-final) > 0 {
+			@if $fallback == true and length($font-fallback) > 0 {
+				@at-root {
+					html.wf-active & {
+						@each $prop, $val in $font-final {
+							#{$prop}: $val;
+						}
+					}
+				}
+			} @else {
+				@each $prop, $val in $font-final {
+					#{$prop}: #{$val};
+				}
+			}
+
+			// Visit https://text-crop.eightshapes.com/ for more infor/generator
+			@if $crop == true and map-has-key($font-type-map, 'linecrop') {
+				@include text-crop($font-type, $line-height);
+			} @else {
+				&::before,
+				&::after {
+					display: none;
+				}
+			}
+		}
+	}
+}
