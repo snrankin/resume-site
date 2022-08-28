@@ -41,6 +41,7 @@
 		"typescript.tsdk": "./node_modules/typescript/lib",
 		"npm-intellisense.showBuildInLibs": false,
 		"js/ts.implicitProjectConfig.checkJs": true,
-		"js/ts.implicitProjectConfig.experimentalDecorators": true
+		"js/ts.implicitProjectConfig.experimentalDecorators": true,
+		"frontMatter.content.autoUpdateDate": true
 	}
 }

@@ -270,7 +270,7 @@ const olologMethods = {
 	},
 };
 
-// exports.ololog = ololog;
+exports.ololog = ololog.configure(olologConfig).methods(olologMethods);
 
 /**
  * @typedef {Object}           LogOptions

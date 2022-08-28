@@ -133,18 +133,16 @@
                     jobDate.prepend(dateText);
                     var date = jobDate.cloneNode(!0);
                     if (date.classList.contains("property-3b6d6761")) {
-                        jobDate.classList.add("start-date"), date.classList.add("start-date");
+                        jobDate.classList.add("start-date");
                         var width = jobDate.offsetWidth, height = jobDate.offsetHeight;
-                        date.style.height = "".concat(width, "px"), date.style.width = "".concat(height, "px"), 
-                        date.setAttribute("style", "--date-width: ".concat(height, "px; --date-height: ").concat(width, "px;")), 
-                        jobDates.start = date;
+                        jobDate.setAttribute("style", "--date-width: ".concat(height, "px; --date-height: ").concat(width, "px;")), 
+                        jobDates.start = jobDate;
                     }
                     if (date.classList.contains("property-4a3d4840")) {
-                        jobDate.classList.add("end-date"), date.classList.add("end-date");
+                        jobDate.classList.add("end-date");
                         var _width = jobDate.offsetWidth, _height = jobDate.offsetHeight;
-                        date.style.height = "".concat(_width, "px"), date.style.width = "".concat(_height, "px"), 
-                        date.setAttribute("style", "--date-width: ".concat(_height, "px; --date-height: ").concat(_width, "px;")), 
-                        jobDates.end = date;
+                        jobDate.setAttribute("style", "--date-width: ".concat(_height, "px; --date-height: ").concat(_width, "px;")), 
+                        jobDates.end = jobDate;
                     }
                 }));
                 var startDate = jobDates.start, endDate = jobDates.end, desktopDates = stringToHtml('<div class="job-dates"></div>');

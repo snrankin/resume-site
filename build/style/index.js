@@ -28,6 +28,16 @@ process.on('unhandledRejection', (e) => {
 	process.exit(1);
 });
 
+const DEFAULT_STATE = {
+	start: null,
+	progress: -1,
+	done: false,
+	message: '',
+	details: [],
+	request: null,
+	hasErrors: false,
+};
+
 function formattedArgs(...args) {
 	let formatted = {
 		message: '',
@@ -184,112 +194,15 @@ class StylishReporter {
 	// 	webpackLogger;
 	// }
 
-	render(stats) {
-		const { rendered, state } = this;
-
-		state.active += 1;
-		state.instances += 1;
-		const opts = {
-			// all: undefined,
-			context: process.cwd(),
-			assets: true,
-			assetsSort: 'name',
-			assetsSpace: 10000,
-			builtAt: true,
-			cachedAssets: false,
-			cachedModules: false,
-			children: false,
-			// chunkGroupAuxiliary: false,
-			// chunkGroupChildren: false,
-			// chunkGroups: false,
-			// chunkModules: false,
-			// chunkOrigins: false,
-			// chunks: false,
-			nestedModules: true,
-			colors: true,
-			entrypoints: true,
-			env: true,
-			errorDetails: 'auto',
-			errors: true,
-			errorStack: true,
-			excludeAssets: ['**/*.map'],
-			excludeModules: [/mini-css/],
-			// groupModulesByPath: true,
-			// groupAssetsByChunk: false,
-			// groupAssetsByPath: false,
-			// groupAssetsByExtension: false,
-			// groupAssetsByEmitStatus: true,
-			hash: true,
-			ids: true,
-			logging: 'log',
-			// moduleAssets: false,
-			// modules: false,
-			moduleTrace: true,
-			providedExports: true,
-			// outputPath: true,
-			// publicPath: false,
-			usedExports: true,
-			reasons: false,
-			// relatedAssets: false,
-			// runtimeModules: false,
-			source: true,
-			// timings: false,
-			// version: false,
-			warnings: true,
-		};
-		const messages = format(stats);
-		const json = stats.toJson(opts, true);
-
-		// for --watch more than anything, don't print duplicate output for a hash
-		// if we've already seen that hash. compensates for a bug in webpack.
-		if (state.hashes.includes(json.hash)) {
-			return;
-		}
-
-		state.active -= 1;
-		state.hashes.push(json.hash);
-		state.time += json.time;
-
-		// errors and warnings go first, to make sure the counts are correct for modules
-		const problems = style.problems(parse.problems(messages, json, state));
-		const files = style.files(parse.files(json, compiler.watchMode), compiler.options);
-		const hidden = style.hidden(parse.hidden(json));
-		const hash = style.hash(json, files, hidden);
-
-		const { version } = json;
-		const out = [];
-
-		if (!rendered.header) {
-			rendered.header = true;
-			out.push(chalk.cyan(`\nwebpack v${version}\n`));
-		}
-
-		out.push(hash);
-		out.push(problems);
-
-		// note: when --watch the active count will drop below zero.
-		if (state.active <= 0) {
-			const footer = style.footer(parse.footer(state));
-			if (footer.length) {
-				rendered.footer = true;
-				out.push(footer);
-			}
-
-			// reset the totals
-			state.totals = { errors: 0, time: 0, warnings: 0 };
-		} else {
-			rendered.footer = false;
-		}
-		log();
-		log(out.join('\n'));
-		log(`Finished build at ${oclock()}`);
-		log();
-
-		if (rendered.footer) {
-			log();
+	_ensureState() {
+		if (!this.states[this.options.name]) {
+			this.states[this.options.name] = {
+				...DEFAULT_STATE,
+				color: this.options.color,
+				name: this.options.name,
+			};
 		}
 	}
-
 	/**
 	 * @type WebpackPluginFunction
 	 * @param {Compiler} compiler
@@ -306,24 +219,128 @@ class StylishReporter {
 		// Compilation object gives us reference to some useful constants.
 		const { Compilation } = webpack;
 
-		const { rendered, state, render } = this;
-		// const logger = compiler.getInfrastructureLogger(PLUGIN_NAME);
+		const { rendered, state, options } = this;
 
-		// logger.log('log from compiler');
+		function render(stats) {
+			state.active += 1;
+			state.instances += 1;
+			const opts = {
+				// all: undefined,
+				context: process.cwd(),
+				assets: true,
+				assetsSort: 'name',
+				assetsSpace: 10000,
+				builtAt: true,
+				cachedAssets: false,
+				cachedModules: false,
+				children: false,
+				// chunkGroupAuxiliary: false,
+				// chunkGroupChildren: false,
+				// chunkGroups: false,
+				// chunkModules: false,
+				// chunkOrigins: false,
+				// chunks: false,
+				nestedModules: true,
+				colors: true,
+				entrypoints: true,
+				env: true,
+				errorDetails: 'auto',
+				errors: true,
+				errorStack: true,
+				excludeAssets: ['**/*.map'],
+				excludeModules: [/mini-css/],
+				// groupModulesByPath: true,
+				// groupAssetsByChunk: false,
+				// groupAssetsByPath: false,
+				// groupAssetsByExtension: false,
+				// groupAssetsByEmitStatus: true,
+				hash: true,
+				ids: true,
+				logging: 'log',
+				// moduleAssets: false,
+				// modules: false,
+				moduleTrace: true,
+				providedExports: true,
+				// outputPath: true,
+				// publicPath: false,
+				usedExports: true,
+				reasons: false,
+				// relatedAssets: false,
+				// runtimeModules: false,
+				source: true,
+				// timings: false,
+				// version: false,
+				warnings: true,
+			};
+			const messages = format(stats);
+			const json = stats.toJson(opts, true);
+
+			// for --watch more than anything, don't print duplicate output for a hash
+			// if we've already seen that hash. compensates for a bug in webpack.
+			if (state.hashes.includes(json.hash)) {
+				return;
+			}
+
+			state.active -= 1;
+			state.hashes.push(json.hash);
+			state.time += json.time;
+
+			// errors and warnings go first, to make sure the counts are correct for modules
+			const problems = style.problems(parse.problems(messages, json, state));
+			const files = style.files(parse.files(json, compiler.watchMode), compiler.options);
+			const hidden = style.hidden(parse.hidden(json));
+			const hash = style.hash(json, files, hidden);
+
+			const { version } = json;
+			const out = [];
+
+			if (!rendered.header) {
+				rendered.header = true;
+				if (options.title !== '') {
+					out.push(chalk.cyan(`\n${options.title}\n`));
+				}
+			}
+
+			out.push(hash);
+			out.push(problems);
+
+			// note: when --watch the active count will drop below zero.
+			if (state.active <= 0) {
+				const footer = style.footer(parse.footer(state));
+				if (footer.length) {
+					rendered.footer = true;
+					out.push(footer);
+				}
+
+				// reset the totals
+				state.totals = { errors: 0, time: 0, warnings: 0 };
+			} else {
+				rendered.footer = false;
+			}
+			ololog.newline();
+			log(out.join('\n'));
+			log(`Finished build at ${oclock()}`);
+			ololog.newline();
+
+			if (rendered.footer) {
+				ololog.newline();
+			}
+		}
+
 		state.active += 1;
 		state.instances += 1;
 
 		compiler.options.stats = 'none';
 
 		if (compiler.hooks) {
-			compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
-				// you can also access Logger from compilation
+			// compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
+			// 	// you can also access Logger from compilation
 
-				logger(pluginName, '', 'log from compilation');
-			});
+			// 	logger(pluginName, '', 'log from compilation');
+			// });
 			compiler.hooks.done.tap(PLUGIN_NAME, render);
 		} else {
-			// compiler.plugin('done', render);
+			compiler.plugin('done', render);
 		}
 	}
 }
