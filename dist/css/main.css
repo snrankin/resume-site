@@ -1,6 +1,3 @@
-/*!*******************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/css/index.scss ***!
-  \*******************************************************************************************************************************************************************************************************************************************/
 @charset "UTF-8";
 html{
     font-size:100%;
@@ -181,13 +178,111 @@ hr{
     border-bottom:none;
 }
 
+:root{
+    --light-red-h:0deg;
+    --light-red-s:100%;
+    --light-red-l:43.92157%;
+    --light-orange-h:32.08163deg;
+    --light-orange-s:100%;
+    --light-orange-l:48.03922%;
+    --light-yellow-h:47.02041deg;
+    --light-yellow-s:100%;
+    --light-yellow-l:48.03922%;
+    --light-green-h:89.81595deg;
+    --light-green-s:100%;
+    --light-green-l:31.96078%;
+    --light-blue-h:190.81081deg;
+    --light-blue-s:99.10714%;
+    --light-blue-l:43.92157%;
+    --light-purple-h:278.98734deg;
+    --light-purple-s:96.73469%;
+    --light-purple-l:48.03922%;
+    --light-pink-h:329.87654deg;
+    --light-pink-s:99.18367%;
+    --light-pink-l:51.96078%;
+    --light-color-bg-default:#fff;
+    --light-color-text-default:#191919;
+    --light-color-border-default:#cccccc;
+    --dark-red-h:0deg;
+    --dark-red-s:100%;
+    --dark-red-l:60.39216%;
+    --dark-orange-h:31.76471deg;
+    --dark-orange-s:100%;
+    --dark-orange-l:50%;
+    --dark-yellow-h:47.29412deg;
+    --dark-yellow-s:100%;
+    --dark-yellow-l:50%;
+    --dark-green-h:90deg;
+    --dark-green-s:100%;
+    --dark-green-l:43.92157%;
+    --dark-blue-h:190.57143deg;
+    --dark-blue-s:99.0566%;
+    --dark-blue-l:58.43137%;
+    --dark-purple-h:278.91892deg;
+    --dark-purple-s:97.36842%;
+    --dark-purple-l:70.19608%;
+    --dark-pink-h:329.68421deg;
+    --dark-pink-s:98.95833%;
+    --dark-pink-l:62.35294%;
+    --dark-color-bg-default:#191919;
+    --dark-color-text-default:#e5e5e5;
+    --dark-color-border-default:#4c4c4c;
+}
+
+@page{
+    margin:0.5in;
+}
+
 body{
     --grid-gap:20px;
+    --headings-font:Poppins, "Helvetica Neue", Geneva, Tahoma, "Nimbus Sans L", "Liberation Sans", "DejaVu Sans Condensed", Myriad, "Myriad Pro", "Gill Sans MT", "Gill Sans", Calibri, Univers, "Frutiger Linotype", Frutiger, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica, Arial, sans-serif, "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "EmojiOne Color", "Noto Color Emoji", "Android Emoji";
+    --body-font:"Source Sans 3", "Helvetica Neue", Geneva, Tahoma, "Nimbus Sans L", "Liberation Sans", "DejaVu Sans Condensed", Myriad, "Myriad Pro", "Gill Sans MT", "Gill Sans", Calibri, Univers, "Frutiger Linotype", Frutiger, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica, Arial, sans-serif, "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "EmojiOne Color", "Noto Color Emoji", "Android Emoji";
+    --code-font:"Source Code Pro", Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace, "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "EmojiOne Color", "Noto Color Emoji", "Android Emoji";
     --collection-header-border:none;
     --column-spacing:0px !important;
     --callout-padding:var(--padding-layout) calc(var(--padding-layout) * 2);
-    --primary-font:'Source Code Pro', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace, 'Twemoji Mozilla', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color', 'Noto Color Emoji', 'Android Emoji';
-    --secondary-font:'Source Sans 3', 'Helvetica Neue', Geneva, Tahoma, 'Nimbus Sans L', 'Liberation Sans', 'DejaVu Sans Condensed', Myriad, 'Myriad Pro', 'Gill Sans MT', 'Gill Sans', Calibri, Univers, 'Frutiger Linotype', Frutiger, system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica, Arial, sans-serif, 'Twemoji Mozilla', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'EmojiOne Color', 'Noto Color Emoji', 'Android Emoji';
+    --primary-font:var(--headings-font);
+    --secondary-font:var(--body-font);
+    --code-padding:calc(var(--padding-layout) * 0.5);
+}
+
+.notion-code{
+    --color-border-default:#4c4c4c;
+}
+
+.notion-code pre,
+.notion-code code{
+    font-family:var(--code-font);
+    line-height:calc(0.025em + 2ex);
+    font-style:"normal";
+    white-space:pre-wrap !important;
+    margin:0;
+    border:var(--border-layout);
+    border-color:var(--dark-color-border-default);
+    background-color:var(--dark-color-bg-default);
+    color:var(--dark-color-text-default);
+}
+
+.notion-code pre::before, .notion-code pre::after,
+.notion-code code::before,
+.notion-code code::after{
+    display:none;
+}
+
+.notion-code pre::before{
+    content:'';
+    height:0.5em;
+    margin-bottom:var(--code-padding);
+    display:block;
+    aspect-ratio:80 / 16;
+    background-image:url("data:image/svg+xml;charset=utf-8,%3C?xml%20version=%271.0%27%20encoding=%27UTF-8%27?%3E%3Csvg%20id=%27a%27%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2780%27%20height=%2716%27%20viewBox=%270%200%2080%2016%27%3E%3Ccircle%20cx=%278%27%20cy=%278%27%20r=%278%27%20fill=%27%23ff3535%27/%3E%3Ccircle%20cx=%2740%27%20cy=%278%27%20r=%278%27%20fill=%27%23ffc900%27/%3E%3Ccircle%20cx=%2772%27%20cy=%278%27%20r=%278%27%20fill=%27%2370e000%27/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain;
+}
+
+.notion-code pre code{
+    border:none !important;
 }
 
 .notion-root{
@@ -242,27 +337,153 @@ body{
     word-break:normal;
 }
 
+h1,
 h1.notion-heading{
-    line-height:calc(0.025em + 2.2ex);
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
     font-weight:bold;
+    font-style:"normal";
+    margin-top:0;
 }
 
-h1.notion-heading::before, h1.notion-heading::after{
-    content:'';
-    display:block;
-    height:0;
-    width:0;
-}
-
-h1.notion-heading::before{
-    margin-bottom:calc(-0.17222em + 0px);
-}
-
+h1::before, h1::after,
+h1.notion-heading::before,
 h1.notion-heading::after{
-    margin-top:calc(-0.22778em + 0px);
+    display:none;
 }
 
+h1:last-child,
+h1.notion-heading:last-child{
+    margin-bottom:0;
+}
+
+h1 .notion-semantic-string > span:first-child,
 h1.notion-heading .notion-semantic-string > span:first-child{
+    display:block;
+}
+
+h2,
+h2.notion-heading{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:bold;
+    font-style:"normal";
+    margin-top:0;
+}
+
+h2::before, h2::after,
+h2.notion-heading::before,
+h2.notion-heading::after{
+    display:none;
+}
+
+h2:last-child,
+h2.notion-heading:last-child{
+    margin-bottom:0;
+}
+
+h2 .notion-semantic-string > span:first-child,
+h2.notion-heading .notion-semantic-string > span:first-child{
+    display:block;
+}
+
+h3,
+h3.notion-heading{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:bold;
+    font-style:"normal";
+    margin-top:0;
+}
+
+h3::before, h3::after,
+h3.notion-heading::before,
+h3.notion-heading::after{
+    display:none;
+}
+
+h3:last-child,
+h3.notion-heading:last-child{
+    margin-bottom:0;
+}
+
+h3 .notion-semantic-string > span:first-child,
+h3.notion-heading .notion-semantic-string > span:first-child{
+    display:block;
+}
+
+h4,
+h4.notion-heading{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:bold;
+    font-style:"normal";
+    margin-top:0;
+}
+
+h4::before, h4::after,
+h4.notion-heading::before,
+h4.notion-heading::after{
+    display:none;
+}
+
+h4:last-child,
+h4.notion-heading:last-child{
+    margin-bottom:0;
+}
+
+h4 .notion-semantic-string > span:first-child,
+h4.notion-heading .notion-semantic-string > span:first-child{
+    display:block;
+}
+
+h5,
+h5.notion-heading{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:bold;
+    font-style:"normal";
+    margin-top:0;
+}
+
+h5::before, h5::after,
+h5.notion-heading::before,
+h5.notion-heading::after{
+    display:none;
+}
+
+h5:last-child,
+h5.notion-heading:last-child{
+    margin-bottom:0;
+}
+
+h5 .notion-semantic-string > span:first-child,
+h5.notion-heading .notion-semantic-string > span:first-child{
+    display:block;
+}
+
+h6,
+h6.notion-heading{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:bold;
+    font-style:"normal";
+    margin-top:0;
+}
+
+h6::before, h6::after,
+h6.notion-heading::before,
+h6.notion-heading::after{
+    display:none;
+}
+
+h6:last-child,
+h6.notion-heading:last-child{
+    margin-bottom:0;
+}
+
+h6 .notion-semantic-string > span:first-child,
+h6.notion-heading .notion-semantic-string > span:first-child{
     display:block;
 }
 
@@ -301,37 +522,27 @@ ul:empty{
 }
 
 .notion-callout{
-    line-height:calc(0.025em + 2ex);
     background-color:var(--color-text-default);
     color:#fff;
-    font-family:var(--primary-font);
+    line-height:2ex;
+}
+
+.notion-callout,.notion-callout .notion-callout__content{
+    font-family:var(--code-font);
     display:inline-block;
     width:auto;
-    font-size:1.5em;
-    font-weight:bold;
-}
-
-.notion-callout::before, .notion-callout::after{
-    content:'';
-    display:block;
-    height:0;
-    width:0;
-}
-
-.notion-callout::before{
-    margin-bottom:calc(-0.17778em + 0px);
-}
-
-.notion-callout::after{
-    margin-top:calc(-0.23333em + 0px);
 }
 
 .notion-callout .notion-callout__content{
+    line-height:calc(0.025em + 2ex);
+    font-style:"normal";
     -webkit-margin-start:0;
             margin-inline-start:0;
-    width:auto;
-    display:inline-block;
     line-height:inherit;
+}
+
+.notion-callout .notion-callout__content::before, .notion-callout .notion-callout__content::after{
+    display:none;
 }
 
 .notion-property__title{
@@ -359,12 +570,29 @@ ul:empty{
     border-bottom:var(--border-layout);
 }
 
+.notion-column-list .notion-column > h2.notion-heading{
+    position:absolute !important;
+    width:1px !important;
+    height:1px !important;
+    padding:0 !important;
+    margin:-1px !important;
+    overflow:hidden !important;
+    clip:rect(0, 0, 0, 0) !important;
+    white-space:nowrap !important;
+    border:0 !important;
+    -webkit-overflow-scrolling:touch;
+}
+
 .notion-column-list .notion-column > .notion-heading:first-of-type{
     margin-top:0;
 }
 
 #block-skills .notion-collection-list{
     flex-flow:row wrap;
+}
+
+#block-skills .notion-collection-group__section-header:not(.no-border){
+    border-top:none !important;
 }
 
 #block-skills .notion-collection-list__item{
@@ -376,9 +604,17 @@ ul:empty{
 }
 
 #block-skills .notion-toggle__trigger + .notion-property .notion-pill{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:bold;
+    font-style:"normal";
     background-color:transparent;
+    color:unset;
     font-size:var(--heading4-size);
-    font-weight:700;
+}
+
+#block-skills .notion-toggle__trigger + .notion-property .notion-pill::before, #block-skills .notion-toggle__trigger + .notion-property .notion-pill::after{
+    display:none;
 }
 
 #block-jobs .notion-collection-list__item{
@@ -393,36 +629,16 @@ ul:empty{
 }
 
 #block-jobs .notion-property__title{
-    width:100%;
-    font-size:var(--heading4-size);
-    font-weight:700;
-}
-
-#block-jobs .notion-property__title .notion-property__title__icon-wrapper{
-    display:none;
-}
-
-#block-jobs .notion-property__title .notion-semantic-string{
+    font-family:var(--headings-font);
     line-height:calc(0.025em + 2ex);
-    display:block;
+    font-weight:bold;
+    font-style:"normal";
     width:100%;
     font-size:var(--heading4-size);
-    font-weight:700 !important;
 }
 
-#block-jobs .notion-property__title .notion-semantic-string::before, #block-jobs .notion-property__title .notion-semantic-string::after{
-    content:'';
-    display:block;
-    height:0;
-    width:0;
-}
-
-#block-jobs .notion-property__title .notion-semantic-string::before{
-    margin-bottom:calc(-0.12222em + 0px);
-}
-
-#block-jobs .notion-property__title .notion-semantic-string::after{
-    margin-top:calc(-0.17778em + 0px);
+#block-jobs .notion-property__title::before, #block-jobs .notion-property__title::after,#block-jobs .notion-property__title .notion-property__title__icon-wrapper{
+    display:none;
 }
 
 #block-jobs .notion-property.notion-property__text{
@@ -458,11 +674,13 @@ ul:empty{
 #block-jobs .notion-property__date,
 #block-jobs .start-date,
 #block-jobs .end-date{
+    font-family:var(--headings-font);
+    line-height:calc(0.025em + 2ex);
+    font-weight:900;
+    font-style:"normal";
     font-size:1rem;
-    font-weight:800;
     text-transform:uppercase;
     color:var(--color-blue);
-    line-height:calc(0.025em + 2ex);
 }
 
 #block-jobs .notion-property__date::before, #block-jobs .notion-property__date::after,
@@ -470,32 +688,16 @@ ul:empty{
 #block-jobs .start-date::after,
 #block-jobs .end-date::before,
 #block-jobs .end-date::after{
-    content:'';
-    display:block;
-    height:0;
-    width:0;
-}
-
-#block-jobs .notion-property__date::before,
-#block-jobs .start-date::before,
-#block-jobs .end-date::before{
-    margin-bottom:calc(-0.12222em + 0px);
-}
-
-#block-jobs .notion-property__date::after,
-#block-jobs .start-date::after,
-#block-jobs .end-date::after{
-    margin-top:calc(-0.17778em + 0px);
+    display:none;
 }
 
 #block-jobs .job-dates{
-    height:100%;
     overflow:hidden;
     display:grid;
     gap:1rem;
-    grid-template-columns:1fr;
-    grid-template-rows:-webkit-min-content 1fr -webkit-min-content;
-    grid-template-rows:min-content 1fr min-content;
+    grid-template-columns:-webkit-min-content 1fr -webkit-min-content;
+    grid-template-columns:min-content 1fr min-content;
+    grid-template-rows:1fr;
     -webkit-overflow-scrolling:touch;
 }
 
@@ -516,10 +718,11 @@ ul:empty{
     background-color:var(--color-border-default);
 }
 
-@media (min-width: 576px){
+@media (min-width: 320px){
     body{
-        --grid-gap:calc(-5.20833vw + 50.0px);
-    }}
+        --grid-gap:calc(-2.23214vw + 27.14286px);
+    }
+}
 
 @media (min-width: 43.75em){
     h1, .h1{
@@ -531,12 +734,38 @@ ul:empty{
         margin-bottom:0.18756em;
         font-size:1.9994em;
         line-height:1.12534;
-    }}
+    }
+}
 
 @media (min-width: 768px){
     body{
-        --grid-gap:calc(-4.46429vw + 64.28571px);
-    }}
+        --grid-gap:calc(-5.20833vw + 70.0px);
+    }
+    #block-jobs .job-dates{
+        height:100%;
+        grid-template-columns:1fr;
+        grid-template-rows:-webkit-min-content 1fr -webkit-min-content;
+        grid-template-rows:min-content 1fr min-content;
+    }
+    #block-jobs .job-dates > .notion-property__date{
+        display:flex;
+        align-items:flex-end;
+        width:var(--date-width);
+        height:var(--date-height);
+    }
+    #block-jobs .job-dates > .notion-property__date.end-date{
+        order:-1;
+    }
+    #block-jobs .job-dates > .notion-property__date.start-date{
+        order:3;
+    }
+    #block-jobs .job-dates > .notion-property__date .date{
+        -webkit-transform-origin:left bottom;
+                transform-origin:left bottom;
+        -webkit-transform:translateX(var(--date-width)) rotate(270deg);
+                transform:translateX(var(--date-width)) rotate(270deg);
+    }
+}
 
 @media (min-width: 56.25em){
     h1, .h1{
@@ -553,9 +782,13 @@ ul:empty{
         margin-bottom:0.18756em;
         font-size:1.9994em;
         line-height:1.12534;
-    }}
+    }
+}
 
 @media (min-width: 960px){
+    body{
+        --grid-gap:40px;
+    }
     .notion-column-list .notion-column:not(:first-child){
         border-left:var(--border-layout);
     }
@@ -570,40 +803,20 @@ ul:empty{
         height:100%;
         width:var(--border-thickness-layout);
     }
-    #block-jobs .job-dates > .notion-property__date{
-        display:flex;
-        align-items:flex-end;
-        width:var(--date-width);
-        height:var(--date-height);
-    }
-    #block-jobs .job-dates > .notion-property__date.end-date{
-        order:-1;
-    }
-    #block-jobs .job-dates > .notion-property__date.start-date{
-        order:3;
-    }
-    #block-jobs .job-dates > .notion-property__date .date{
-        -webkit-transform-origin:left bottom;
-                transform-origin:left bottom;
-        -webkit-transform:translateX(var(--date-width)) rotate(270deg);
-                transform:translateX(var(--date-width)) rotate(270deg);
-    }}
-
-@media (min-width: 992px){
-    body{
-        --grid-gap:40px;
-    }}
+}
 
 @media screen and (max-width: 960px){
     .notion-column-list .notion-column{
         --column-spacing:0px;
         width:100% !important;
-    }}
+    }
+}
 
 @media (max-width: 959px){
     .notion-root{
         max-width:100%;
-    }}
+    }
+}
 
 @media screen and (max-width: 959px){
     .notion-column-list > .row{
@@ -611,9 +824,72 @@ ul:empty{
     }
     .notion-column-list > .row .notion-column{
         width:100% !important;
-    }}
+    }
+}
 
 @media print{
+    body{
+        font-size:13pt;
+        background:#fff !important;
+        --red-h:0deg;
+        --red-s:100%;
+        --red-l:43.92157%;
+        --orange-h:32.08163deg;
+        --orange-s:100%;
+        --orange-l:48.03922%;
+        --yellow-h:47.02041deg;
+        --yellow-s:100%;
+        --yellow-l:48.03922%;
+        --green-h:89.81595deg;
+        --green-s:100%;
+        --green-l:31.96078%;
+        --blue-h:190.81081deg;
+        --blue-s:99.10714%;
+        --blue-l:43.92157%;
+        --purple-h:278.98734deg;
+        --purple-s:96.73469%;
+        --purple-l:48.03922%;
+        --pink-h:329.87654deg;
+        --pink-s:99.18367%;
+        --pink-l:51.96078%;
+        --color-bg-default:#fff;
+        --color-text-default:#191919;
+        --color-border-default:#cccccc;
+    }
+    .super-navbar,
+    .notion-header.page{
+        display:none;
+    }
+    .notion-root > *{
+        page-break-inside:avoid;
+    }
+    .super-content{
+        padding:0;
+    }
+    a,blockquote{
+        page-break-inside:avoid;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,img{
+        page-break-after:avoid;
+        page-break-inside:avoid;
+    }
+    table,
+    pre{
+        page-break-inside:avoid;
+    }
+    ul,
+    ol,
+    dl{
+        page-break-before:avoid;
+    }
+    #block-jobs .notion-collection-list__item{
+        page-break-inside:avoid;
+    }
     .notion-root{
         max-width:100%;
     }
@@ -644,5 +920,6 @@ ul:empty{
                 transform-origin:left bottom;
         -webkit-transform:translateX(var(--date-width)) rotate(270deg);
                 transform:translateX(var(--date-width)) rotate(270deg);
-    }}
+    }
+}
 

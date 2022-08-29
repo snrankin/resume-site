@@ -1,3 +1,11 @@
+/*
+ *
+ * Reporter
+ * @author    Sam Rankin <srankin@riester.com>
+ * @copyright 2022 RIESTER
+ * @version   1.0.0
+ */
+
 // @ts-check
 
 const chalk = require('chalk');
@@ -6,13 +14,15 @@ const style = require('./lib/style');
 const format = require('webpack-format-messages');
 const oclock = require('o-clock');
 const createWebpackLogger = require('webpack/lib/logging/createConsoleLogger.js');
-
+const path = require('path');
 const PLUGIN_NAME = 'StylishReporter';
-const { log, ololog, formatLogTitle } = require('./logger');
+const { log, ololog } = require('./logger');
+const prettyTime = require('pretty-ms');
 const SyncBailHook = require('tapable/lib/SyncBailHook');
 const createConsoleLogger = require('webpack/lib/logging/createConsoleLogger');
-const { Logger, LogType } = require('webpack/lib/logging/Logger.js');
+const WebpackBarPlugin = require('webpackbar');
 const memoize = require('webpack/lib/util/memoize');
+const stdEnv = require('std-env');
 const getValidate = memoize(() => require('schema-utils').validate);
 /** @typedef {import("webpack/lib/logging/Logger").Logger} WebpackLogger */
 /** @typedef {import("webpack/lib/logging/Logger").LogTypeEnum} LogTypeEnum */
@@ -37,6 +47,26 @@ const DEFAULT_STATE = {
 	request: null,
 	hasErrors: false,
 };
+
+const DEFAULTS = {
+	name: 'webpack',
+	color: 'green',
+	reporters: stdEnv.isMinimal ? ['basic'] : ['fancy'],
+	reporter: null,
+};
+
+function shortenPath(path$1 = '') {
+	const cwd = process.cwd() + path.sep;
+	return String(path$1).replace(cwd, '');
+}
+
+function hook(compiler, hookName, fn) {
+	if (compiler.hooks) {
+		compiler.hooks[hookName].tap('WebpackBar:' + hookName, fn);
+	} else {
+		compiler.plugin(hookName, fn);
+	}
+}
 
 function formattedArgs(...args) {
 	let formatted = {
@@ -150,11 +180,18 @@ function logger(name = '', type = '', args = []) {
  * @type WebpackPluginInstance
  * @class StylishReporter
  */
-class StylishReporter {
+class StylishReporter extends WebpackBarPlugin {
 	static defaultOptions = {
 		title: '',
 	};
 	constructor(options = {}) {
+		super(options);
+		this.reporters[0].done = (context) => {
+			if (context.state.profiler) {
+				context.state.profile = context.state.profiler.getFormattedStats();
+				delete context.state.profiler;
+			}
+		};
 		this.state = {
 			active: 0,
 			hashes: [],
@@ -170,122 +207,6 @@ class StylishReporter {
 			footer: false,
 			header: false,
 		};
-
-		this.compiler = {};
-
-		this.options = { ...StylishReporter.defaultOptions, ...options };
-	}
-
-	render(stats) {
-		this.state.active += 1;
-		this.state.instances += 1;
-		const opts = {
-			// all: undefined,
-			context: this.compiler.context,
-			assets: true,
-			assetsSort: 'name',
-			assetsSpace: 10000,
-			builtAt: true,
-			cachedAssets: false,
-			cachedModules: false,
-			children: false,
-			// chunkGroupAuxiliary: false,
-			// chunkGroupChildren: false,
-			// chunkGroups: false,
-			// chunkModules: false,
-			// chunkOrigins: false,
-			// chunks: false,
-			nestedModules: true,
-			colors: true,
-			entrypoints: true,
-			env: true,
-			errorDetails: true,
-			errors: true,
-			errorStack: true,
-			excludeAssets: ['**/*.map'],
-			excludeModules: [
-				(moduleSource) => {
-					let test = moduleSource.includes('.webpack');
-
-					return test;
-				},
-			],
-			// groupModulesByPath: true,
-			// groupAssetsByChunk: false,
-			// groupAssetsByPath: false,
-			// groupAssetsByExtension: false,
-			// groupAssetsByEmitStatus: true,
-			hash: true,
-			ids: true,
-			logging: 'log',
-			// moduleAssets: false,
-			// modules: false,
-			moduleTrace: true,
-			providedExports: true,
-			// outputPath: true,
-			// publicPath: false,
-			usedExports: true,
-			reasons: false,
-			// relatedAssets: false,
-			// runtimeModules: false,
-			source: true,
-			// timings: false,
-			// version: false,
-			warnings: true,
-		};
-		const messages = format(stats);
-		const json = stats.toJson(opts, true);
-
-		// for --watch more than anything, don't print duplicate output for a hash
-		// if we've already seen that hash. compensates for a bug in webpack.
-		if (this.state.hashes.includes(json.hash)) {
-			return;
-		}
-
-		this.state.active -= 1;
-		this.state.hashes.push(json.hash);
-		this.state.time += json.time;
-
-		// errors and warnings go first, to make sure the counts are correct for modules
-		const problems = style.problems(parse.problems(stats, this.state));
-		const files = style.files(parse.files(json, this.compiler.watchMode), this.compiler.options);
-		const hidden = style.hidden(parse.hidden(json));
-		const hash = style.hash(json, files, hidden);
-
-		const { version } = json;
-		const out = [];
-
-		if (!this.rendered.header) {
-			this.rendered.header = true;
-			if (this.options.title !== '') {
-				out.push(chalk.cyan(`\n${this.options.title}\n`));
-			}
-		}
-
-		out.push(hash);
-		out.push(problems);
-
-		// note: when --watch the active count will drop below zero.
-		if (this.state.active <= 0) {
-			const footer = style.footer(parse.footer(this.state));
-			if (footer.length) {
-				this.rendered.footer = true;
-				out.push(footer);
-			}
-
-			// reset the totals
-			this.state.totals = { errors: 0, time: 0, warnings: 0 };
-		} else {
-			this.rendered.footer = false;
-		}
-		ololog.newline();
-		log(out.join('\n'));
-		// log(`Finished build at ${oclock()}`);
-		// ololog.newline();
-
-		if (this.rendered.footer && this.compiler.options.watch === true) {
-			ololog.newline();
-		}
 	}
 
 	/**
@@ -293,10 +214,8 @@ class StylishReporter {
 	 * @param {Compiler} compiler
 	 * @memberof StylishReporter
 	 */
-	apply(compiler) {
+	renderStats(compiler) {
 		const pluginName = StylishReporter.name;
-
-		this.compiler = compiler;
 
 		// webpack module instance can be accessed from the compiler object,
 		// this ensures that correct version of the module is used
@@ -306,12 +225,14 @@ class StylishReporter {
 		// Compilation object gives us reference to some useful constants.
 		const { Compilation } = webpack;
 
-		const plugin = this;
+		const { rendered, state, options } = this;
 
 		function render(stats) {
+			state.active += 1;
+			state.instances += 1;
 			const opts = {
 				// all: undefined,
-				context: compiler.context,
+				context: process.cwd(),
 				assets: true,
 				assetsSort: 'name',
 				assetsSpace: 10000,
@@ -363,21 +284,20 @@ class StylishReporter {
 				// version: false,
 				warnings: true,
 			};
-			const messages = format(stats);
 			const json = stats.toJson(opts, true);
 
 			// for --watch more than anything, don't print duplicate output for a hash
 			// if we've already seen that hash. compensates for a bug in webpack.
-			if (plugin.state.hashes.includes(json.hash)) {
+			if (state.hashes.includes(json.hash)) {
 				return;
 			}
 
-			plugin.state.active -= 1;
-			plugin.state.hashes.push(json.hash);
-			plugin.state.time += json.time;
+			state.active -= 1;
+			state.hashes.push(json.hash);
+			state.time += json.time;
 
 			// errors and warnings go first, to make sure the counts are correct for modules
-			const problems = style.problems(parse.problems(stats, plugin.state));
+			const problems = style.problems(parse.problems(stats, state));
 			const files = style.files(parse.files(json, compiler.watchMode), compiler.options);
 			const hidden = style.hidden(parse.hidden(json));
 			const hash = style.hash(json, files, hidden);
@@ -385,13 +305,10 @@ class StylishReporter {
 			const { version } = json;
 			const out = [];
 
-			let logTitle = '';
-
-			if (!plugin.rendered.header) {
-				plugin.rendered.header = true;
-				if (plugin.options.title !== '') {
-					let when = new Date().toLocaleString();
-					logTitle = `${chalk.dim(when)}\t${chalk.cyanBright.bold(plugin.options.title)}`;
+			if (!rendered.header) {
+				rendered.header = true;
+				if (options.title !== '') {
+					out.push(chalk.cyan(`\n${options.title}\n`));
 				}
 			}
 
@@ -399,31 +316,30 @@ class StylishReporter {
 			out.push(problems);
 
 			// note: when --watch the active count will drop below zero.
-			if (plugin.state.active <= 0) {
-				const footer = style.footer(parse.footer(plugin.state));
+			if (state.active <= 0) {
+				const footer = style.footer(parse.footer(state));
 				if (footer.length) {
-					plugin.rendered.footer = true;
+					rendered.footer = true;
 					out.push(footer);
 				}
 
 				// reset the totals
-				plugin.state.totals = { errors: 0, time: 0, warnings: 0 };
+				state.totals = { errors: 0, time: 0, warnings: 0 };
 			} else {
-				plugin.rendered.footer = false;
+				rendered.footer = false;
 			}
-			console.log('');
-			console.log('');
-			console.log(formatLogTitle('', logTitle, out, true));
-			// log(out.join('\n'), { title: logTitle, separator: true });
-			console.log('');
+			ololog.newline();
+			log(out.join('\n'));
+			log(`Finished build at ${oclock()}`);
+			ololog.newline();
 
-			if (plugin.rendered.footer) {
-				console.log('');
+			if (rendered.footer) {
+				ololog.newline();
 			}
 		}
 
-		this.state.active += 1;
-		this.state.instances += 1;
+		state.active += 1;
+		state.instances += 1;
 
 		compiler.options.stats = 'none';
 
@@ -433,10 +349,60 @@ class StylishReporter {
 
 			// 	logger(pluginName, '', 'log from compilation');
 			// });
-			compiler.hooks.done.tap(pluginName, render);
+			compiler.hooks.done.tap(PLUGIN_NAME, render);
 		} else {
 			compiler.plugin('done', render);
 		}
+	}
+
+	apply(compiler) {
+		if (compiler.webpackbar) {
+			return;
+		}
+		compiler.webpackbar = this;
+		super.apply(compiler);
+		hook(compiler, 'afterPlugins', () => {
+			this._ensureState();
+		});
+		hook(compiler, 'compile', () => {
+			this._ensureState();
+			Object.assign(this.state, {
+				...DEFAULT_STATE,
+				start: process.hrtime(),
+			});
+			this.callReporters('start');
+		});
+		hook(compiler, 'invalid', (fileName, changeTime) => {
+			this._ensureState();
+			this.callReporters('change', {
+				path: fileName,
+				shortPath: shortenPath(fileName),
+				time: changeTime,
+			});
+		});
+		hook(compiler, 'done', (stats) => {
+			this._ensureState();
+			if (this.state.done) {
+				return;
+			}
+			const hasErrors = stats.hasErrors();
+			const status = hasErrors ? 'with some errors' : 'successfully';
+			const time = this.state.start ? ' in ' + prettyTime(process.hrtime(this.state.start), 2) : '';
+			Object.assign(this.state, {
+				...DEFAULT_STATE,
+				progress: 100,
+				done: true,
+				message: `Compiled ${status}${time}`,
+				hasErrors,
+			});
+			this.callReporters('progress');
+			this.callReporters('done', { stats });
+			if (!this.hasRunning) {
+				this.callReporters('beforeAllDone');
+				this.callReporters('allDone');
+				this.callReporters('afterAllDone');
+			}
+		});
 	}
 }
 

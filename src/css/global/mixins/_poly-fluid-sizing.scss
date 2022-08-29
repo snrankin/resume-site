@@ -6,11 +6,6 @@
 /// @copyright 2022 RIESTER
 /// ======================================================================== ///
 
-// Dependency functions
-@import '~poly-fluid-sizing/list-remove';
-@import '~poly-fluid-sizing/list-sort';
-@import '~poly-fluid-sizing/map-sort';
-
 /// poly-fluid-sizing
 /// Generate linear interpolated size values through multiple break points
 /// @param $property - A string CSS property name
@@ -39,7 +34,7 @@
 
 	// Sort the map by viewport width (key)
 	// $map: map-sort($map);
-	@include _assert-ascending($map, '$map');
+	// @include _assert-ascending($map, '$map');
 
 	$keys: map-keys($map);
 	// Minimum size
@@ -126,7 +121,7 @@
 			@if $breakpoint == 'xs' {
 				$breakpoint: 320px;
 			} @else {
-				$breakpoint: map-get($grid-breakpoints, $breakpoint);
+				$breakpoint: map-get($breakpoints, $breakpoint);
 			}
 		}
 

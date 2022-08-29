@@ -1,0 +1,34 @@
+/// ======================================================================== ///
+///
+/// @copyright 2022 RIESTER
+/// @group  resume-site
+/// @name   _root
+/// @version   1.0.0
+/// ======================================================================== ///
+:root {
+	// // Note: Custom variable values only support SassScript inside `#{}`.
+
+	// // Colors
+	// //
+	// // Generate palettes for full colors, grays, and theme colors.
+
+	@each $color-name, $color-map in $light-colors-hsl {
+		@each $color-component, $value in $color-map {
+			--light-#{$color-name}-#{$color-component}: #{$value};
+		}
+	}
+
+	@each $color-name, $color in $light-colors {
+		--light-color-#{$color-name}-default: #{$color};
+	}
+
+	@each $color-name, $color-map in $dark-colors-hsl {
+		@each $color-component, $value in $color-map {
+			--dark-#{$color-name}-#{$color-component}: #{$value};
+		}
+	}
+
+	@each $color-name, $color in $dark-colors {
+		--dark-color-#{$color-name}-default: #{$color};
+	}
+}

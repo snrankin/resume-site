@@ -140,7 +140,7 @@ module.exports = {
 		return chalk.dim(text);
 	},
 
-	problems(problems) {
+	problems(items) {
 		const result = [];
 		const { dim } = chalk;
 		const types = { errors: 'error', warnings: 'warning' };
@@ -148,13 +148,11 @@ module.exports = {
 		// tableOpts.spanningCells = [{ col: 0, row: 0, colSpan: 3 }];
 
 		// render problem table per-file
-		for (const key of Object.keys(problems)) {
-			const problem = problems[key];
+		for (const [file, fileProblems] of Object.entries(items)) {
 			let tableOpts = options;
 
 			tableOpts.columns = [
 				{ alignment: 'left', paddingLeft: 0, paddingRight: 2 },
-				{ alignment: 'left', paddingLeft: 2, paddingRight: 2 },
 				{ alignment: 'left', paddingLeft: 2, paddingRight: 2 },
 				{ alignment: 'left', paddingLeft: 2, paddingRight: 0 },
 			];
@@ -164,53 +162,53 @@ module.exports = {
 
 			tableOpts.header = {
 				alignment: 'left',
-				content: `${key}`,
+				content: `${file}`,
 			};
 
 			// header.push([key, '', '', '']);
 
 			// result.push('', chalk.underline(key));
 
-			for (const type of Object.keys(types)) {
-				let errType = types[type];
-
+			for (const [errType, problems] of Object.entries(fileProblems)) {
+				let type;
 				if (!isEmpty(errType)) {
 					switch (errType) {
 						case 'errors':
 						case 'error':
-							errType = 'error';
+							type = 'error';
 
 							break;
 						case 'warnings':
 						case 'warning':
 						case 'warn':
-							errType = 'warn';
+							type = 'warn';
 
 							break;
 					}
 				}
+				for (const problem of problems) {
+					let bgColor = decoratorLevel(type, 'bg');
+					let color = decoratorLevel(type, 'text');
+					let symbol = color(decoratorLevel(type, 'symbol'));
 
-				for (const item of problem[type]) {
-					let bgColor = decoratorLevel(errType, 'bg');
-					let color = decoratorLevel(errType, 'color');
-					let symbol = color(decoratorLevel(errType, 'symbol'));
+					const message = problem.message;
+					const lines = message.split('\n').filter(function (line) {
+						return !isEmpty(line) && line !== ' ';
+					});
+					const probType = color(type);
 
-					const message = item.message;
-					const lines = message.split('\n');
-					const probType = color(type.substring(0, type.length - 1));
+					let fileLocation = dim(`${problem.file}:${problem.line}:${problem.column}`);
 
-					let fileLocation = dim(`${item.file}:${item.line}:${item.column}`);
-
-					header.push([`${symbol}`, `${probType}`, `${fileLocation}`, `${lines[0]}`]);
+					header.push([`${symbol}`, `${probType}`, `${fileLocation}`]);
 
 					let test = typeof header;
 
-					// let header = [`${symbol}`, `${probType}`, `${dim(`${item.file}:${item.line}:${item.column}`)}`, `${lines[0]}`];
+					// let header = [`${symbol}`, `${probType}`, `${dim(`${problem.file}:${item.line}:${item.column}`)}`, `${lines[0]}`];
 					header = table(header, tableOpts);
 
 					rows.push(header);
 
-					for (const line of lines.slice(1)) {
+					for (const line of lines) {
 						rows.push(line);
 					}
 				}

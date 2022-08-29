@@ -166,7 +166,6 @@
 }
 
 @function lineheightex($size) {
-	@debug inspect($size);
 	$unit: get-unit($size);
 
 	@if $unit == '%' {
@@ -197,7 +196,12 @@
 /// @param {*} $crop-font-size [36]
 
 @function dynamic-line-crop($line-height: 1.5, $crop: 0, $crop-line-height: 1.3, $crop-font-size: 36) {
-	@return divide(max(($crop + ($line-height - $crop-line-height) * divide($crop-font-size, 2)), 0), $crop-font-size);
+	$dynamic-crop: divide(
+		max(($crop + ($line-height - $crop-line-height) * divide($crop-font-size, 2)), 0),
+		$crop-font-size
+	);
+	@debug var-info($dynamic-crop);
+	@return $dynamic-crop;
 }
 
 @function is-number($value) {
@@ -444,7 +448,7 @@
 		$result: #{$list};
 	}
 
-	@return $result;
+	@return inspect($result);
 }
 
 // ========================================================================== //
@@ -701,18 +705,6 @@
 	@return $px-size;
 }
 
-@function lineheightex($size) {
-	$unit: get-unit($size);
-	$number: strip-units($size);
-	@if $unit == '%' {
-		$number: divide($number, 100);
-	} @else if $unit == 'px' {
-		$number: rem($size);
-		$number: strip-units($number);
-	}
-	@return $number * 2ex;
-}
-
 @function em($pixels, $context: $font-size-base) {
 	@if unitless($pixels) {
 		$pixels: $pixels * 1px;
@@ -723,12 +715,6 @@
 	}
 
 	@return divide($pixels, $context) * 1em;
-}
-
-@function line-height($size) {
-	$size: lineheightex($size);
-
-	@return calc(0.025em + #{$size});
 }
 
 @function cssvar($entry, $prefix: '') {

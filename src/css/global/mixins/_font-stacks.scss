@@ -107,21 +107,26 @@ $base-stacks: (
 	$type: map-get($font-map, 'type');
 	$fallback-stack: map-get($base-stacks, $type);
 
-	@if map-has($font-map, 'preload') {
+	@if has-preload($key) {
 		$preload-font-map: map-get($font-map, 'preload');
-		$preload-font: map-get($preload-font-map, 'font-family');
-		$preload-stack: $fallback-stack;
-		@if index($preload-stack, $preload-font) {
-			$preload-stack: remove(
+
+		@if type-of($preload-font-map) == 'map' {
+			$preload-font: map-get($preload-font-map, 'font-family');
+			$preload-stack: $fallback-stack;
+			@if index($preload-stack, $preload-font) {
+				$preload-stack: remove(
+					$preload-stack,
+					$preload-font
+				); // Removing to prevent duplicates and move value to the front of the list
+			}
+
+			$preload-stack: prepend(
 				$preload-stack,
 				$preload-font
-			); // Removing to prevent duplicates and move value to the front of the list
+			); // Adding desired first preload to the front of the list
+			$preload-stack: font-list($preload-stack);
+			$preload: map-set($preload, 'font-family', $preload-stack);
 		}
-
-		$preload-stack: prepend($preload-stack, $preload-font); // Adding desired first preload to the front of the list
-		$preload-stack: font-list($preload-stack);
-		$preload: map-set($preload, 'font-family', $preload-stack);
-		$font-map: map-set($font-map, 'load', $load);
 	}
 
 	$font-stack: $fallback-stack;
@@ -146,26 +151,41 @@ $base-font-family: 'sans-serif' !default;
 $base-font-weight: 'regular' !default;
 $base-font-style: 'normal' !default; //Italic
 
+@function has-preload($font-type) {
+	@if not(map-has($font-families, $font-type)) and not(type-of(map-get($font-families, $font-type))) {
+		@error 'get( $map, $key ) there is no key #{$k} in map #{$i}.. #{print($m)} ';
+	} @else {
+		$font-settings: map-get($font-families, $font-type);
+		@if map-has($font-settings, 'preload') and type-of(map-get($font-settings, 'preload')) {
+			@return map-has($font-families, 'font-family');
+		}
+	}
+}
+
 @function font-family($font-type, $fallback: false) {
 	$font: '';
 	@if not(map-has-key($font-families, $font-type)) {
 		@error 'get( $map, $key ) there is no key #{$k} in map #{$i}.. #{print($m)} ';
 	} @else {
-		@if $fallback == true and map-deep-has($font-families, $font-type, 'preload', 'font-family') {
+		@if $fallback == true and has-preload($font-type) {
 			$font: map-deep-get($font-families, $font-type, 'preload', 'font-family');
 		} @else {
-			$font: map-deep-get($font-families, $font-type, 'load', 'font-family');
+			$font: map-deep-get($font-families, $font-type, 'font-family');
 		}
 	}
 
 	@return $font;
 }
 
-@mixin font-family-var($var, $font-type: '', $prefix: $variable-prefix) {
-	--#{$prefix}#{$var}: #{font-family($font-type, true)};
+@mixin font-family-var($var, $font-type: '', $preload: false, $prefix: '') {
+	@if $preload == true and has-preload($font-type) {
+		--#{$prefix}#{$var}: #{inspect(font-family($font-type, true))};
 
-	html.wf-active & {
-		--#{$prefix}#{$var}: #{font-family($font-type, false)};
+		html.wf-active & {
+			--#{$prefix}#{$var}: #{inspect(font-family($font-type, false))};
+		}
+	} @else {
+		--#{$prefix}#{$var}: #{inspect(font-family($font-type, false))};
 	}
 }
 
@@ -179,43 +199,51 @@ $base-font-style: 'normal' !default; //Italic
 /// @param {*} $crop-font-size [36]
 
 @function dynamic-line-crop($line-height: 1.5, $crop: 0, $crop-line-height: 1.3, $crop-font-size: 36) {
-	@return divide(max(($crop + ($line-height - $crop-line-height) * divide($crop-font-size, 2)), 0), $crop-font-size);
+	$dynamic-crop: divide(
+		max(($crop + ($line-height - $crop-line-height) * divide($crop-font-size, 2)), 0),
+		$crop-font-size
+	);
+
+	@return $dynamic-crop;
 }
 
-@mixin text-crop($font-family, $line-height: 1.3, $top-adjustment: 0px, $bottom-adjustment: 0px) {
+@mixin text-crop($font-type, $line-height: 1.3, $top-adjustment: 0px, $bottom-adjustment: 0px) {
 	@if not(map-has-key($font-families, $font-type)) {
 		@error 'The font \'#{$font-type}\' doesn\'t exist.';
 	} @else {
 		$font-type-map: map-get($font-families, $font-type);
 		$line-crop-settings: map-get($font-type-map, 'linecrop');
-		// Configured in Step 1
-		$top-crop: map-get($line-crop-settings, 'top');
-		$bottom-crop: map-get($line-crop-settings, 'bottom');
-		$crop-font-size: map-get($line-crop-settings, 'font-size');
-		$crop-line-height: map-get($line-crop-settings, 'line-height');
+		@debug var-info($line-crop-settings);
+		@if type-of($line-crop-settings) == 'map' {
+			// Configured in Step 1
+			$top-crop: map-get($line-crop-settings, 'top');
+			$bottom-crop: map-get($line-crop-settings, 'bottom');
+			$crop-font-size: map-get($line-crop-settings, 'font-size');
+			$crop-line-height: map-get($line-crop-settings, 'line-height');
 
-		// Apply values to calculate em-based margins that work with any font size
-		$dynamic-top-crop: dynamic-line-crop($line-height, $top-crop, $crop-line-height, $crop-font-size);
-		$dynamic-bottom-crop: dynamic-line-crop($line-height, $bottom-crop, $crop-line-height, $crop-font-size);
+			// Apply values to calculate em-based margins that work with any font size
+			$dynamic-top-crop: dynamic-line-crop($line-height, $top-crop, $crop-line-height, $crop-font-size);
+			$dynamic-bottom-crop: dynamic-line-crop($line-height, $bottom-crop, $crop-line-height, $crop-font-size);
 
-		// Mixin output
+			// Mixin output
 
-		line-height: line-height($line-height);
+			line-height: line-height($line-height);
 
-		&::before,
-		&::after {
-			content: '';
-			display: block;
-			height: 0;
-			width: 0;
-		}
+			&::before,
+			&::after {
+				content: '';
+				display: block;
+				height: 0;
+				width: 0;
+			}
 
-		&::before {
-			margin-bottom: calc(-#{$dynamic-top-crop}em + #{$top-adjustment});
-		}
+			&::before {
+				margin-bottom: calc(#{$dynamic-top-crop}em + #{$top-adjustment});
+			}
 
-		&::after {
-			margin-top: calc(-#{$dynamic-bottom-crop}em + #{$bottom-adjustment});
+			&::after {
+				margin-top: calc(#{$dynamic-bottom-crop}em + #{$bottom-adjustment});
+			}
 		}
 	}
 }
@@ -294,7 +322,7 @@ $base-font-style: 'normal' !default; //Italic
 				}
 			} @else {
 				@each $prop, $val in $font-final {
-					#{$prop}: #{$val};
+					#{$prop}: $val;
 				}
 			}
 

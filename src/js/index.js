@@ -22,6 +22,24 @@ function stringToHtml(str) {
 	return dom;
 }
 
+function get(obj, path, defValue) {
+	// If path is not defined or it has false value
+	if (!path) return undefined;
+	// Check if path is string or array. Regex : ensure that we do not have '.' and brackets.
+	// Regex explained: https://regexr.com/58j0k
+	const pathArray = Array.isArray(path) ? path : path.match(/([^[.\]])+/g);
+	// Find value
+	const result = pathArray.reduce((prevObj, key) => prevObj && prevObj[key], obj);
+	// If found value is undefined return default value; otherwise return the value
+	return result === undefined ? defValue : result;
+}
+
+function sortObjectByKeys(o) {
+	return Object.keys(o)
+		.sort()
+		.reduce((r, k) => ((r[k] = o[k]), r), {}); // eslint-disable-line
+}
+
 function isElement($obj) {
 	try {
 		return !!$obj.constructor.__proto__.prototype.constructor.name; //eslint-disable-line
@@ -194,3 +212,97 @@ if (document.querySelector('.notion-column-list > .row') == null) {
 	let columns = document.querySelectorAll('.notion-column-list >  .notion-column');
 	wrapElement(columns, '<div class="row"></div>');
 }
+
+if (window.matchMedia('(prefers-color-scheme:dark)').matches) {
+	window.colorScheme = 'dark';
+} else {
+	window.colorScheme = 'light';
+}
+
+function getAllCSSVariableNames(prefix = '', sameDomain = false, styleSheets = document.styleSheets) {
+	if (!prefix.match(/^--/)) {
+		prefix = `--${prefix}`;
+	}
+	var cssVars = {};
+	if (sameDomain) {
+		const isSameDomain = (styleSheet) => {
+			if (!styleSheet.href) {
+				return true;
+			}
+
+			return styleSheet.href.indexOf(window.location.origin) === 0;
+		};
+		styleSheets = [...styleSheets].filter(isSameDomain);
+	}
+	// loop each stylesheet
+	for (var i = 0; i < styleSheets.length; i++) {
+		// loop stylesheet's cssRules
+		let stylesheet = styleSheets[i];
+
+		try {
+			let styleSheetRules = styleSheets[i].cssRules;
+			if (styleSheetRules.length > 0) {
+				// try/catch used because 'hasOwnProperty' doesn't work
+				for (var j = 0; j < styleSheetRules.length; j++) {
+					try {
+						let styleSheetRule = styleSheetRules[j];
+
+						if (styleSheetRule.type === 1) {
+							// loop stylesheet's cssRules' style (property names)
+							for (var k = 0; k < styleSheetRule.style.length; k++) {
+								let name = styleSheetRule.style[k];
+								// test name for css variable signiture and uniqueness
+								if (name.startsWith(prefix)) {
+									let value = styleSheetRule.style.getPropertyValue(name).trim();
+									cssVars[name] = value;
+								}
+							}
+						}
+					} catch (error) {
+						console.error(error);
+					}
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+	return cssVars;
+}
+function getElementCSSVariables(allCSSVars, element = document.body, pseudo) {
+	var elStyles = window.getComputedStyle(element, pseudo);
+	var cssVars = {};
+	for (var i = 0; i < allCSSVars.length; i++) {
+		let key = allCSSVars[i];
+		let value = elStyles.getPropertyValue(key);
+		if (value) {
+			cssVars[key] = value;
+		}
+	}
+	return cssVars;
+}
+getAllCSSVariableNames('dark', true);
+function switchColorScheme(type) {
+	const colors = getAllCSSVariableNames(type, true);
+
+	const styleNode = document.getElementById('color-sheme');
+	let colorStyles = ':root{';
+	Object.entries(colors).forEach((entry) => {
+		let [cssVar, varVal] = entry;
+		cssVar = cssVar.replace(`${type}-`, '');
+		let value = `${cssVar}: ${varVal} !important;`;
+		colorStyles += value;
+	});
+	colorStyles += '}';
+	if (styleNode) {
+		styleNode.innerHTML = colorStyles;
+	} else {
+		var s = document.createElement('style');
+		s.setAttribute('id', 'color-sheme');
+		s.type = 'text/css';
+		s.innerText = colorStyles;
+		document.head.appendChild(s);
+	}
+}
+
+switchColorScheme(window.colorScheme);

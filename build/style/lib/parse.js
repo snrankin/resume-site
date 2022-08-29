@@ -4,7 +4,7 @@ const { isEmpty } = require('../utils');
 const _ = require('lodash');
 const path = require('path');
 const plur = require('plur');
-const format = require('webpack-format-messages');
+const formatMessages = require('webpack-format-messages');
 const errorLabel = 'Syntax error:';
 const isLikelyASyntaxError = (str) => str.includes(errorLabel);
 const StackTracey = require('stacktracey');
@@ -15,7 +15,18 @@ const sassRegex = /^SassError/gm;
 const strip = require('strip-ansi');
 const ansiRegex = require('ansi-regex');
 const { partition } = require('printable-characters');
+const { formatMessage } = require('webpack-format-messages');
+const { log, ololog, trace } = require('../logger');
+const { isString } = require('lodash');
+const { container } = require('webpack');
+const formattedStack = new StackUtils({ cwd: process.cwd(), internals: StackUtils.nodeInternals() });
 
+const reFileList = /((assets|entrypoints):[\s\S]+)$/i;
+const srcFile = /^\.\//i;
+const rePerformance = /^([\w ]+ limit|[\w ]+ recommendations): /i;
+const rePosition = /\s?\(?((\d+):(\d+))(-\d+)?\)?/;
+const pathRegEx = new RegExp(`${process.cwd()}[^:]+:`); //eslint-disable-line
+const relPathRegEx = new RegExp(`${process.cwd()}/`);
 module.exports = {
 	assets(stats, isWatch) {
 		const result = [];
@@ -150,35 +161,89 @@ module.exports = {
 		return result;
 	},
 
-	problems(messages, stats, state) {
+	problems(stats, state) {
 		const probs = {};
 
-		for (const level of ['errors', 'warnings']) {
-			for (const [i, reported] of stats[level].entries()) {
-				const message = messages[level][i];
-				let isError = false;
-				if (level === 'errors') {
-					isError = true;
+		const messages = formatMessages(stats);
+		const json = stats.toJson();
+
+		stats = stats.compilation;
+
+		const { errors, warnings } = stats;
+
+		const result = {
+			errors,
+			warnings,
+		};
+
+		for (const [level, items] of Object.entries(result)) {
+			for (let [i, reported] of Object.entries(items)) {
+				let reportedJson = json[level][i];
+				if (reported.message.includes('mini-css')) {
+					continue;
 				}
-				const item = module.exports.problem(reported, message, isError);
-				if (item) {
-					const { file } = item;
+
+				reported = { ...reported, ...reportedJson };
+
+				// if (json[level][i].moduleTrace.length > 0) {
+				// 	continue;
+				// }
+
+				// const message = messages[level][i];
+				if (typeof reported !== 'undefined') {
+					let isError = false;
+					if (level === 'errors') {
+						isError = true;
+					}
+					const item = this.problem(reported, isError);
+					const { file, module } = item;
 					const problem = probs[file] || { errors: [], warnings: [] };
 
 					problem[level].push(item);
 
-					for (const module of stats.modules) {
+					for (const moduleItem of json.modules) {
 						// manually update the error count. something is broken in webpack
-						if (file === module.id || file === module.name || file === module.identifier) {
-							module[level] += 1;
+						if (
+							module === moduleItem.id ||
+							module === moduleItem.name ||
+							module === moduleItem.identifier
+						) {
+							moduleItem[level] += 1;
 						}
 					}
 
-					probs[file] = problem;
+					probs[module] = problem;
 					state.totals[level] += 1;
 				}
 			}
 		}
+
+		// for (const level of ['errors', 'warnings']) {
+		// 	for (const [i, reported] of json[level].entries()) {
+		// 		const message = messages[level][i];
+		// 		let isError = false;
+		// 		if (level === 'errors') {
+		// 			isError = true;
+		// 		}
+		// 		const item = module.exports.problem(reported, message, isError);
+		// 		if (item) {
+		// 			const { file } = item;
+		// 			const problem = probs[file] || { errors: [], warnings: [] };
+
+		// 			problem[level].push(item);
+
+		// 			for (const module of json.modules) {
+		// 				// manually update the error count. something is broken in webpack
+		// 				if (file === module.id || file === module.name || file === module.identifier) {
+		// 					module[level] += 1;
+		// 				}
+		// 			}
+
+		// 			probs[file] = problem;
+		// 			state.totals[level] += 1;
+		// 		}
+		// 	}
+		// }
 
 		return probs;
 	},
@@ -191,140 +256,131 @@ module.exports = {
 		}).parseLine(err);
 	},
 
-	problem(original, msg, isError) {
-		const reFileList = /((assets|entrypoints):[\s\S]+)$/i;
-		const srcFile = /^\.\//i;
-		const rePerformance = /^([\w ]+ limit|[\w ]+ recommendations): /i;
-		const rePosition = /\s?\(?((\d+):(\d+))(-\d+)?\)?/;
+	problem(original, isError) {
 		const { removeLoaders } = this;
 
 		// if (typeof original === 'object') {
 		// 	message = err.details || err.stack || err.message;
 		// }
 
-		let problem;
-		let file;
-		let fileList;
-		let line;
-		let column;
-		let module;
-		// let message;
+		let error = _.get(original, 'error', {}),
+			file = _.get(original, 'file', ''),
+			module = _.get(original, 'moduleId', false) || _.get(original, 'moduleName', ''),
+			name = _.get(original, 'name', ''),
+			loc = _.get(original, 'loc', { line: 0, column: 0 }),
+			message = _.get(original, 'message', ''),
+			stack = _.get(original, 'stack', ''),
+			fileList = [];
 
-		let stack;
-
-		if (typeof original === 'object') {
-			problem = original.details || original.stack || original.message;
-			module = original.moduleIdentifier;
+		if (typeof error === 'object' && !Array.isArray(error)) {
+			// problem = error.message;
+			message = _.get(error, 'message', message);
+			file = _.get(error, 'file', file);
+			loc = _.get(error, 'loc', loc);
+			name = _.get(error, 'name', name);
+			stack = _.get(error, 'stack', stack);
 		}
 
-		if (!isEmpty(module)) {
-			module = module.replace(/^([^?]+).*/, '$1');
-			module = module.replace(/^([^!]+).*/, '$1');
-			if (module.includes('mini-css-extract')) {
-				return false;
+		if (name === 'SassError') {
+			file = message.split('\n').filter(function (line) {
+				return /\son line\s/.test(line);
+			});
+			file = file[0];
+			file = file.replace(/,.*/gm, '');
+			file = file.replace(/^\s*on\s.*of\s/gm, './');
+			message = message.split('\n').filter(function (line) {
+				return !/\son line\s/.test(line) && line !== '';
+			});
+			message = message.join('\n');
+			stack = '';
+		}
+
+		if (!isEmpty(stack) && name !== 'SassError') {
+			stack = trace(original);
+		}
+
+		if (!isEmpty(module) && isString(module)) {
+			module = removeLoaders(module);
+			if (!file) {
+				file = module;
 			}
-			file = module;
 		}
 
-		if (rePerformance.test(problem)) {
+		if (rePerformance.test(message)) {
 			// the prefix of the performance errors are overly verbose for stylish
 			file = 'performance';
-			problem = problem.replace(rePerformance, '');
+			message = message.replace(rePerformance, '');
 		}
 
 		if (srcFile.test(original.moduleId)) {
 			file = original.moduleId;
 		}
 
-		if (reFileList.test(problem)) {
-			const matches = problem.match(reFileList);
+		if (reFileList.test(message)) {
+			const matches = message.match(reFileList);
 			fileList = matches.length ? matches[0] : '<stylish-error>';
 			// replace spaces with a unicode character we can replace later to
 			// preserve formatting, and allow for automation. replace 3 spaces with
 			// 2 to match stylish output.
 			fileList = fileList.trim().replace(/ {3}/g, '  ').replace(/ /g, '░');
-			problem = problem.replace(reFileList, '');
+			message = message.replace(reFileList, '');
 		}
 
-		problem = this.formatMessage(problem, isError);
+		let lines = this.formatMessage(message, isError);
 
-		let lines = problem.trim().split('\n');
-
-		if (lines.length > 2 && lines[1] === '') {
-			lines.splice(1, 1); // Remove extra newline.
-		}
-
-		// Remove loader notation from filenames:
-		//   `./~/css-loader!./src/App.css` ~~> `./src/App.css`
-		if (lines[0].lastIndexOf('!') !== -1) {
-			lines[0] = lines[0].substr(lines[0].lastIndexOf('!') + 1);
-		}
-
-		// Remove useless `entry` filename stack details
-		lines = lines.filter((line) => {
-			let isEntry = /^\s+@\s|^\s+at\s/im.test(line);
-			return !isEntry;
-		});
-
-		// if (!lines[0] || !lines[1]) {
-		// 	file = module;
-		// }
-
-		// if (lines[0].match(sassRegex)) {
-		// 	let fileLocation = lines
-		// 		.find((line) => {
-		// 			return line.match(/\d+:\d+\s*@import$/);
-		// 		})
-		// 		.split(' ');
-
-		// 	fileLocation = fileLocation.filter((line) => {
-		// 		return line !== '' && line !== '@import';
-		// 	});
-		// 	let location;
-		// 	[file, location] = fileLocation;
-		// 	location = location.split(':');
-		// 	[line, column] = location;
-
-		// 	lines = lines.filter((line) => !line.endsWith('@import') && !line.endsWith('stylesheet'));
-		// }
+		let { line, column } = loc;
 
 		if (!file) {
-			[file] = lines;
+			file = lines[0];
+			file = file.replace(/:.*/, '').trim();
 		} else {
 			lines.unshift('');
 		}
 
-		let [, message] = lines;
-		message = message || 'webpack-stylish: <please report unknown message format>';
+		let msg = lines.join('\n');
+		msg = msg || 'webpack-stylish: <please report unknown message format>';
 
 		if (!line || !column) {
-			if (rePosition.test(message)) {
-				// warnings position format (beginning of the message)
-				[, , line, column] = message.match(rePosition) || [0, 0, 0, 0];
+			if (rePosition.test(msg)) {
+				// warnings position format (beginning of the msg)
+				[, , line, column] = msg.match(rePosition) || [0, 0, 0, 0];
 
 				if (lines.length > 3) {
-					message = lines.slice(1, lines.length).join('\n');
+					msg = lines.slice(1, lines.length);
 				}
 			} else {
-				// errors position format (end of the message)
+				// errors position format (end of the msg)
 				const position = lines[lines.length - 1];
 				if (rePosition.test(position)) {
 					[, , line, column] = position.match(rePosition) || [0, 0, 0, 0];
-					message = lines.slice(1, lines.length - 1).join('\n');
+					msg = lines.slice(1, lines.length - 1);
 				} else {
 					[line, column] = [0, 0];
 				}
 			}
 		}
 
-		let pathRegEx = new RegExp(`${process.cwd()}.*:`);
+		if (rePosition.test(lines[0])) {
+			lines.shift();
+			msg = lines.join('\n');
+		}
 
-		message = message.replace(rePosition, '').replace(pathRegEx, '').trim();
+		msg = msg.replace(pathRegEx, '').trim();
 
-		const item = { file, message, line, column };
+		if (file && relPathRegEx.test(file)) {
+			file = file.replace(relPathRegEx, './').trim();
+		}
+
+		message = msg;
+
+		let item = { file, message, line, column, module };
 
 		if (fileList) {
 			item.message += `\n ${fileList}`;
+		}
+
+		if (stack) {
+			item.message += `\n ${stack}`;
 		}
 
 		return item;
@@ -465,7 +521,7 @@ module.exports = {
 		// 	return !sassStack.test(line);
 		// });
 
-		lines = lines.join('\n').trim();
+		// lines = lines.join('\n').trim();
 
 		// Reassemble & Strip internal tracing, except `webpack:` -- (create-react-app/pull/1050)
 		return lines;

@@ -132,21 +132,24 @@ const decoratorLevel = (lvl = '', type = 'text') => {
 		lvl = 'none';
 	}
 
-	return tagLevelDecorators[type][lvl];
+	return _.get(tagLevelDecorators, `${type}.${lvl}`);
 };
 
 exports.decoratorLevel = decoratorLevel;
 
-const trace = (startingPoint = 0) => {
-	return new StackTracey()
+const trace = (error = undefined, start = 0, pretty = true) => {
+	let stack = new StackTracey(error, start)
 		.withSources()
-		.slice(startingPoint)
 		.filter((x) => {
 			return !x.thirdParty && !x.file.includes('node:');
 		})
 		.clean();
+	if (pretty) {
+		return stack.asTable();
+	}
+	return stack;
 };
-
+exports.trace = trace;
 /**
  *
  *
@@ -205,7 +208,7 @@ function formatLogTitle(level = '', title = '', lines = [], addDivider = true) {
 
 	lines.unshift(tag);
 
-	return lines;
+	return lines.join('\n');
 }
 
 exports.formatLogTitle = formatLogTitle;
@@ -239,12 +242,12 @@ const olologConfig = {
 	},
 	locate: {
 		shift: 1,
-		where: new StackTracey()
-			.withSources()
-			.filter((x) => {
-				return !x.thirdParty && !x.file.includes('node:');
-			})
-			.clean(),
+		// where: new StackTracey()
+		// 	.withSources()
+		// 	.filter((x) => {
+		// 		return !x.thirdParty && !x.file.includes('node:');
+		// 	})
+		// 	.clean(),
 		print: (args) => {
 			if (_.has(args, 'items')) {
 				args = args.items.pop();
@@ -268,6 +271,14 @@ const olologMethods = {
 	get success() {
 		return this.configure({ tag: { level: 'success' }, render: { consoleMethod: '' } });
 	},
+	get value() {
+		this.configure({
+			render(text, { consoleMethod = '' }) {
+				return text;
+			},
+		});
+		return this;
+	},
 };
 
 exports.ololog = ololog.configure(olologConfig).methods(olologMethods);
@@ -289,7 +300,7 @@ exports.ololog = ololog.configure(olologConfig).methods(olologMethods);
  * @param {LogOptions} options
  * @returns {*}
  */
-function log(msg, options) {
+function log(msg, options, echo = true) {
 	const defaults = {
 		level: '',
 		title: '',
@@ -305,6 +316,7 @@ function log(msg, options) {
 		locate,
 		time,
 		tag: {
+			level,
 			title,
 			separator,
 		},
@@ -314,17 +326,25 @@ function log(msg, options) {
 
 	const log = ololog.configure(logConfig).methods(olologMethods);
 
-	if (unlimited) {
-		if (!isEmpty(level)) {
-			log.unlimited[level](msg);
+	if (!echo) {
+		if (unlimited) {
+			return log.unlimited.value(msg);
 		} else {
-			log.unlimited(msg);
+			return log.value(msg);
 		}
 	} else {
-		if (!isEmpty(level)) {
-			log[level](msg);
+		if (unlimited) {
+			if (!isEmpty(level)) {
+				log.unlimited[level](msg);
+			} else {
+				log.unlimited(msg);
+			}
 		} else {
-			log(msg);
+			if (!isEmpty(level)) {
+				log[level](msg);
+			} else {
+				log(msg);
+			}
 		}
 	}
 }

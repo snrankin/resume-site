@@ -1,0 +1,167 @@
+/// ======================================================================== ///
+///
+/// @copyright 2022 RIESTER
+/// @group  resume-site
+/// @name   _global
+/// @version   1.0.0
+/// ======================================================================== ///
+
+body {
+	$map: (
+		mobile: 20px,
+		tablet: 30px,
+		desktop: 40px,
+	);
+	@include pfs('--grid-gap', $map);
+	@include font-family-var('headings-font', 'headings');
+	@include font-family-var('body-font', 'body');
+	@include font-family-var('code-font', 'code');
+
+	--collection-header-border: none;
+	--column-spacing: 0px !important;
+	--callout-padding: var(--padding-layout) calc(var(--padding-layout) * 2);
+	--primary-font: var(--headings-font);
+	--secondary-font: var(--body-font);
+	--code-padding: calc(var(--padding-layout) * 0.5);
+}
+
+.notion-code {
+	--color-border-default: #{$gray-700};
+
+	pre,
+	code {
+		@include font-stack('code');
+
+		white-space: pre-wrap !important;
+		margin: 0;
+		border: var(--border-layout);
+		border-color: var(--dark-color-border-default);
+		background-color: var(--dark-color-bg-default);
+		color: var(--dark-color-text-default);
+	}
+
+	pre {
+		&::before {
+			content: '';
+			height: 0.5em;
+			margin-bottom: var(--code-padding);
+			display: block;
+			aspect-ratio: 80 / 16;
+			background-image: svg-load('window-dots.svg');
+			background-repeat: no-repeat;
+			background-position: center center;
+			background-size: contain;
+		}
+
+		code {
+			border: none !important;
+		}
+	}
+}
+
+.notion-root {
+	max-width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+
+	@include media('<desktop') {
+		max-width: 100%;
+	}
+	@include media('print') {
+		max-width: 100%;
+	}
+}
+
+.notion-heading {
+	margin-top: 0;
+	padding: 0;
+	font-family: var(--secondary-font);
+}
+
+.notion-collection-list {
+	overflow: unset !important;
+}
+
+.notion-collection-list__item {
+	padding: 0;
+}
+
+.notion-collection-list__item-property {
+	line-height: inherit;
+	padding: 0;
+	max-width: 100%;
+}
+
+.notion-collection-list__item-content {
+	flex-direction: column;
+	max-width: 100%;
+
+	.notion-property__text {
+		max-width: 100%;
+	}
+}
+
+.notion-semantic-string {
+	white-space: normal !important;
+	line-height: inherit !important;
+	display: inline;
+	text-overflow: unset;
+	margin-inline-start: 0;
+	margin-inline-end: 0;
+	font-weight: inherit !important;
+
+	span {
+		white-space: normal;
+		word-break: normal;
+	}
+}
+
+@for $i from 1 through 6 {
+	h#{$i},
+	h#{$i}.notion-heading {
+		@include font-stack('headings', bold);
+
+		margin-top: 0;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.notion-semantic-string {
+			> span:first-child {
+				display: block;
+			}
+		}
+	}
+}
+
+strong {
+	font-weight: 700;
+}
+
+ol,
+ul {
+	padding-left: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	&:not([class]) {
+		li {
+			line-height: inherit;
+			margin-inline-start: 1em;
+
+			&::marker {
+				font-weight: bold;
+				color: var(--color-purple);
+			}
+		}
+	}
+
+	&:empty {
+		display: none;
+	}
+}

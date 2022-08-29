@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const _ = require('lodash');
 const path = require('path');
 const { argv } = require('yargs');
 const { merge, mergeWithCustomize, customizeArray } = require('webpack-merge');
@@ -8,12 +9,52 @@ const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanupMiniCssExtractPlugin = require('cleanup-mini-css-extract-plugin');
 const magicImporter = require('node-sass-magic-importer');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { log, ololog } = require('./build/logger');
 const StylishReporter = require('./build/style/index');
 const WebpackBar = require('webpackbar');
+
+/**
+ * Get the current enviornment
+ *
+ * @return {*}
+ */
+const env = () => {
+	if (_.has(argv, 'mode')) {
+		return argv.mode;
+	} else if (_.has(argv, 'env')) {
+		return argv.env;
+	} else if (_.has(argv, 'node-env')) {
+		return argv.env;
+	} else if (_.has(argv, 'p')) {
+		return 'production';
+	}
+	return 'development';
+};
+
+exports.env = env;
+
+/**
+ * Is the mode set to production
+ *
+ * @type {Boolean}
+ */
+const isProduction = env() === 'production';
+
+exports.isProduction = isProduction;
+
+/**
+ * Is the mode set to development
+ *
+ * @type {Boolean}
+ */
+const isDevelopment = env() === 'development';
+
+exports.isDevelopment = isDevelopment;
+
 const postcssConfig = {
 	parser: 'postcss-scss',
 	plugins: [
@@ -24,7 +65,12 @@ const postcssConfig = {
 		'postcss-easings',
 		'postcss-easing-gradients',
 		'postcss-letter-tracking',
-		'postcss-inline-svg',
+		[
+			'postcss-inline-svg',
+			{
+				paths: [path.join(process.cwd(), 'src', 'img')],
+			},
+		],
 		[
 			'postcss-sort-media-queries',
 			{
@@ -36,25 +82,9 @@ const postcssConfig = {
 		'autoprefixer',
 		'postcss-merge-rules',
 		[
-			'cssnano',
-			{
-				preset: [
-					'lite',
-					{
-						normalizeWhitespace: false,
-						mergeRules: true,
-						discardDuplicates: true,
-						safe: true,
-						calc: false,
-						normalizeCharset: true,
-					},
-				],
-			},
-		],
-		[
 			'postcss-reporter',
 			{
-				clearReportedMessages: true,
+				clearReportedMessages: false,
 				filter: (message) => {
 					return true;
 				},
@@ -85,16 +115,41 @@ const config = {
 				terserOptions: {
 					format: {
 						comments: false,
-						beautify: true,
+						beautify: isDevelopment,
 					},
 					ecma: 2022,
 					safari10: true,
-					mangle: false,
-					compress: false,
-					sourceMap: true,
+					mangle: isProduction,
+					compress: isProduction,
+					sourceMap: isDevelopment,
 				},
 				parallel: true,
 				extractComments: false,
+			}),
+			new CssMinimizerPlugin({
+				minimizerOptions: {
+					preset: isProduction
+						? [
+								'default',
+								{
+									discardComments: {
+										removeAll: true,
+									},
+								},
+						  ]
+						: [
+								'lite',
+								{
+									normalizeWhitespace: false,
+									mergeRules: true,
+									discardDuplicates: true,
+									safe: true,
+									calc: false,
+									normalizeCharset: true,
+									discardComments: { removeAll: true },
+								},
+						  ],
+				},
 			}),
 		],
 	},
@@ -184,15 +239,9 @@ const config = {
 		],
 	},
 	plugins: [
-		new WebpackBuildNotifierPlugin({
-			appName: 'Resume',
-			buildSuccessful: true,
-			suppressSuccess: false,
-			showDuration: true,
-			suppressCompileStart: false,
-		}),
 		new WebpackBar({
 			name: 'Resume',
+			reporters: ['fancy'],
 		}),
 
 		new ESLintPlugin({
@@ -216,21 +265,16 @@ const config = {
 			filename: 'css/[name].css',
 		}),
 		new CleanupMiniCssExtractPlugin({ warnings: true }),
-		// new FriendlyErrorsPlugin({
-		// 	onErrors: (severity, errors) => {
-		// 		if (severity !== 'error') {
-		// 			errors.forEach(function (e) {
-		// 				log(e, { type: 'warn' });
-		// 			});
-		// 		} else {
-		// 			errors.forEach(function (e) {
-		// 				log(e, { type: 'error' });
-		// 			});
-		// 		}
-		// 	},
-		// 	clearConsole: false,
-		// }),
-		new StylishReporter(),
+		new StylishReporter({
+			title: 'Resume',
+		}),
+		new WebpackBuildNotifierPlugin({
+			appName: 'Resume',
+			buildSuccessful: true,
+			suppressSuccess: false,
+			showDuration: true,
+			suppressCompileStart: false,
+		}),
 	],
 };
 

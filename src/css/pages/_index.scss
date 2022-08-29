@@ -1,7 +1,11 @@
 /// ======================================================================== ///
 ///
 /// @copyright 2022 RIESTER
-/// @group  scss
-/// @name   _type-styles
-/// @version   <<projectversion>>
+/// @group  resume-site
+/// @name   _index
+/// @version   1.0.0
 /// ======================================================================== ///
+
+@import 'global';
+
+@import 'home';

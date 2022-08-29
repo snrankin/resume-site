@@ -1,0 +1,80 @@
+/// ======================================================================== ///
+///
+/// @copyright 2022 RIESTER
+/// @group  resume-site
+/// @name   _print
+/// @version   1.0.0
+/// ======================================================================== ///
+///
+
+@media print {
+	body {
+		font-size: 13pt;
+		background: #fff !important;
+
+		@each $color-name, $color-map in $light-colors-hsl {
+			@each $color-component, $value in $color-map {
+				--#{$color-name}-#{$color-component}: #{$value};
+			}
+		}
+
+		@each $color-name, $color in $light-colors {
+			--color-#{$color-name}-default: #{$color};
+		}
+	}
+
+	.super-navbar,
+	.notion-header.page {
+		display: none;
+	}
+
+	.notion-root > * {
+		page-break-inside: avoid;
+	}
+
+	.super-content {
+		padding: 0;
+	}
+
+	a {
+		page-break-inside: avoid;
+	}
+
+	blockquote {
+		page-break-inside: avoid;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		page-break-after: avoid;
+		page-break-inside: avoid;
+	}
+
+	img {
+		page-break-inside: avoid;
+		page-break-after: avoid;
+	}
+
+	table,
+	pre {
+		page-break-inside: avoid;
+	}
+
+	ul,
+	ol,
+	dl {
+		page-break-before: avoid;
+	}
+
+	#block-jobs .notion-collection-list__item {
+		page-break-inside: avoid;
+	}
+}
+
+@page {
+	margin: 0.5in;
+}

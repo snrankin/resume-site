@@ -6,6 +6,35 @@
 ///
 ///
 
+%remove-link {
+	&:hover {
+		background-color: transparent;
+		cursor: unset;
+	}
+
+	&:focus {
+		background-color: transparent;
+		cursor: unset;
+	}
+
+	.notion-collection-list__item-anchor {
+		display: none;
+	}
+
+	.notion-property__title {
+		.notion-semantic-string {
+			text-overflow: unset;
+			margin-inline-start: 0;
+			margin-inline-end: 0;
+			font-weight: normal;
+
+			> span {
+				border-bottom: none;
+			}
+		}
+	}
+}
+
 // ------------------------------- Icon Fonts ------------------------------- //
 
 @mixin icon($icon-font-family) {
