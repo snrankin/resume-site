@@ -13,8 +13,6 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const { log, ololog } = require('./build/logger');
-const StylishReporter = require('./build/style/index');
 const WebpackBar = require('webpackbar');
 
 /**
@@ -241,7 +239,6 @@ const config = {
 	plugins: [
 		new WebpackBar({
 			name: 'Resume',
-			reporters: ['fancy'],
 		}),
 
 		new ESLintPlugin({
@@ -265,9 +262,7 @@ const config = {
 			filename: 'css/[name].css',
 		}),
 		new CleanupMiniCssExtractPlugin({ warnings: true }),
-		new StylishReporter({
-			title: 'Resume',
-		}),
+
 		new WebpackBuildNotifierPlugin({
 			appName: 'Resume',
 			buildSuccessful: true,
