@@ -42,6 +42,8 @@
 		"npm-intellisense.showBuildInLibs": false,
 		"js/ts.implicitProjectConfig.checkJs": true,
 		"js/ts.implicitProjectConfig.experimentalDecorators": true,
-		"frontMatter.content.autoUpdateDate": true
+		"frontMatter.content.autoUpdateDate": true,
+		"commitizen.signCommits": true,
+		"git.enableCommitSigning": true
 	}
 }
