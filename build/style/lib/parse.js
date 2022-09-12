@@ -1,6 +1,6 @@
 'use strict';
 
-const { isEmpty } = require('../utils');
+const { isEmpty, removeLoaders } = require('../utils');
 const _ = require('lodash');
 const path = require('path');
 const plur = require('plur');
@@ -453,61 +453,74 @@ module.exports = {
 			lines.splice(1, 1); // Remove extra newline.
 		}
 
-		// Remove loader notation from filenames:
-		//   `./~/css-loader!./src/App.css` ~~> `./src/App.css`
-		if (lines[0].lastIndexOf('!') !== -1) {
-			lines[0] = lines[0].substr(lines[0].lastIndexOf('!') + 1);
-		}
-
-		// Remove useless `entry` filename stack details
-		lines = lines.filter((line) => line.indexOf(' @ ') !== 0);
-
 		// // 0 ~> filename; 1 ~> main err msg
 		// if (!lines[0] || !lines[1]) {
 		// 	return lines.join('\n');
 		// }
 
 		// Cleans up verbose "module not found" messages for files and packages.
-		if (lines[1].startsWith('Module not found: ')) {
-			lines = [
-				lines[0],
-				lines[1] // "Module not found: " is enough detail
-					.replace("Cannot resolve 'file' or 'directory' ", '') // eslint-disable-line
-					.replace('Cannot resolve module ', '')
-					.replace('Error: ', '')
-					.replace('[CaseSensitivePathsPlugin] ', ''),
-			];
-		}
+		// if (lines[1].startsWith('Module not found: ')) {
+		// 	lines = [
+		// 		lines[0],
+		// 		lines[1] // "Module not found: " is enough detail
+		// 			.replace("Cannot resolve 'file' or 'directory' ", '') // eslint-disable-line
+		// 			.replace('Cannot resolve module ', '')
+		// 			.replace('Error: ', '')
+		// 			.replace('[CaseSensitivePathsPlugin] ', ''),
+		// 	];
+		// }
 
-		// Cleans up syntax error messages.
-		if (lines[0].startsWith('ModuleBuildError: ')) {
-			lines.shift();
-		}
-		if (lines[0].startsWith('SassError:')) {
-			lines[0] = lines[0].replace('SassError:', errorLabel);
-		}
-		if (lines[0].startsWith('HookWebpackError: ')) {
-			lines[0] = lines[0].replace('Module build failed: SyntaxError:', errorLabel);
-		}
-		if (lines[1].startsWith('Module build failed: ')) {
-			lines[1] = lines[1].replace('Module build failed: SyntaxError:', errorLabel);
-		}
+		// // Cleans up syntax error messages.
+		// if (lines[0].startsWith('ModuleBuildError: ')) {
+		// 	lines.shift();
+		// }
+		// if (lines[0].startsWith('SassError:')) {
+		// 	lines[0] = lines[0].replace('SassError:', errorLabel);
+		// }
+		// if (lines[0].startsWith('HookWebpackError: ')) {
+		// 	lines[0] = lines[0].replace('Module build failed: SyntaxError:', errorLabel);
+		// }
+		// if (lines[1].startsWith('Module build failed: ')) {
+		// 	lines[1] = lines[1].replace('Module build failed: SyntaxError:', errorLabel);
+		// }
 
-		// Cleans up syntax error messages.
-		if (lines[1].startsWith('Module build failed: ')) {
-			lines[1] = lines[1].replace('Module build failed: SyntaxError:', errorLabel);
-		}
+		// // Cleans up syntax error messages.
+		// if (lines[1].startsWith('Module build failed: ')) {
+		// 	lines[1] = lines[1].replace('Module build failed: SyntaxError:', errorLabel);
+		// }
 
-		if (lines[1].match(exportRegex)) {
-			lines[1] = lines[1].replace(exportRegex, "$1 '$4' does not contain an export named '$3'."); //eslint-disable-line
-		}
+		// if (lines[1].match(exportRegex)) {
+		// 	lines[1] = lines[1].replace(exportRegex, "$1 '$4' does not contain an export named '$3'."); //eslint-disable-line
+		// }
 
 		let sassSrcLine = lines.find((line) => line.endsWith('@import'));
 
-		lines = _.remove(lines, function (line) {
-			const regex = new RegExp('^\\s*at\\s*.+$|^\\s*.+@import$|^\\s*.+root stylesheet$', 'img');
+		// Remove useless `entry` filename stack details
+		lines = lines.filter((line) => {
+			return line.indexOf(' @ ') !== 0 || line.endsWith('@import') || line.endsWith('stylesheet');
+		});
 
-			return !regex.test(line);
+		lines = lines.map(function (line) {
+			line = line
+				.replace("Cannot resolve 'file' or 'directory' ", '') // eslint-disable-line
+				.replace('Cannot resolve module ', '')
+				.replace('Error: ', '')
+				.replace('Error: ', '')
+				.replace('SassError: ', '')
+				.replace('SyntaxError: ', '')
+				.replace('[CaseSensitivePathsPlugin] ', '');
+
+			// line = removeLoaders(line);
+
+			if (line.match(exportRegex)) {
+				line = line.replace(exportRegex, "$1 '$4' does not contain an export named '$3'."); //eslint-disable-line
+			}
+
+			if (line.indexOf('!') !== 0) {
+				line = line.substr(line.lastIndexOf('!') + 1);
+			}
+
+			return line;
 		});
 
 		if (sassSrcLine) {

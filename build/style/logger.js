@@ -351,15 +351,6 @@ function log(msg, options, echo = true) {
 
 exports.log = log;
 
-process.on('uncaughtException', (e) => {
-	log(e, { type: 'error' });
-	process.exit(1);
-});
-process.on('unhandledRejection', (e) => {
-	log(e, { type: 'error' });
-	process.exit(1);
-});
-
 /**
  * @param {string} name name of the logger
  * @param {LogTypeEnum} type type of the log entry
