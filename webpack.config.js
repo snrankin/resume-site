@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const _ = require('lodash');
 const path = require('path');
 const { argv } = require('yargs');
+const util = require('util');
 const { merge, mergeWithCustomize, customizeArray } = require('webpack-merge');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
@@ -20,18 +21,22 @@ const WebpackBar = require('webpackbar');
  *
  * @return {*}
  */
-const env = () => {
+const getEnv = () => {
 	if (_.has(argv, 'mode')) {
 		return argv.mode;
 	} else if (_.has(argv, 'env')) {
 		return argv.env;
 	} else if (_.has(argv, 'node-env')) {
-		return argv.env;
+		return argv['node-env'];
 	} else if (_.has(argv, 'p')) {
 		return 'production';
 	}
 	return 'development';
 };
+
+const env = getEnv();
+
+console.log('🚀 ~ file: webpack.config.js ~ line 39 ~ env', env);
 
 exports.env = env;
 
@@ -40,7 +45,7 @@ exports.env = env;
  *
  * @type {Boolean}
  */
-const isProduction = env() === 'production';
+const isProduction = env === 'production';
 
 exports.isProduction = isProduction;
 
@@ -49,7 +54,7 @@ exports.isProduction = isProduction;
  *
  * @type {Boolean}
  */
-const isDevelopment = env() === 'development';
+const isDevelopment = env === 'development';
 
 exports.isDevelopment = isDevelopment;
 
@@ -263,14 +268,15 @@ const config = {
 		}),
 		new CleanupMiniCssExtractPlugin({ warnings: true }),
 
-		new WebpackBuildNotifierPlugin({
-			appName: 'Resume',
-			buildSuccessful: true,
-			suppressSuccess: false,
-			showDuration: true,
-			suppressCompileStart: false,
-		}),
+		// new WebpackBuildNotifierPlugin({
+		// 	appName: 'Resume',
+		// 	buildSuccessful: true,
+		// 	suppressSuccess: false,
+		// 	showDuration: true,
+		// 	suppressCompileStart: false,
+		// }),
 	],
 };
 
+console.log(util.inspect(config, { depth: null, color: true }));
 module.exports = config;

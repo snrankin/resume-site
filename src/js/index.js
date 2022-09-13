@@ -1,3 +1,23 @@
+function isEmpty(el) {
+	if (el === undefined || el == null) {
+		return true;
+	}
+	if (typeof el === 'string' && el.length > 0) {
+		return false;
+	} else if (el === true) {
+		return false;
+	} else if (el instanceof Object) {
+		if (Array.isArray(el) && el.length > 0) {
+			return false;
+		} else {
+			if (Object.keys(el).length > 0) {
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
 function stringToHtml(str) {
 	// If DOMParser is supported, use it
 	let domParserSupport = (function () {
@@ -98,12 +118,13 @@ function makeList(node) {
 			return textNode.length > 1;
 		})
 		.map(function (textNode) {
+			let bullet = textNode.match(/(-+)\s/gm);
 			textNode = textNode.replace(/\s*•\s*/, '').trim();
 			textNode = `<li>${textNode}</li>`;
 			return textNode;
 		});
 	text = text.join('\n');
-	let list = stringToHtml(`<ul>${text}</ul>`);
+	let list = convertMarkdownToHtml(text);
 	node.parentElement.replaceWith(list);
 }
 function getChildNodes(node) {
@@ -120,11 +141,43 @@ function getChildNodes(node) {
 		}
 	}
 }
-document
-	.querySelectorAll('#block-jobs .notion-collection-list__item-content .notion-property__text.property-79483e77')
-	.forEach(function (block) {
-		getChildNodes(block);
-	});
+
+function convertJobDescriptionLists(id) {
+	let pageHtml = fetch(`https://notion-page-to-html-api.vercel.app/html?id=${id}`, {
+		method: 'GET',
+	}).then((res) => res.text());
+	return pageHtml;
+}
+
+function addJobDescriptions() {
+	document
+		.querySelectorAll(
+			'#block-jobs .notion-collection-list__item-content .property-6c5e6670 .notion-semantic-string > span'
+		)
+		.forEach(function (block) {
+			let id = block.innerHTML;
+
+			if (!isEmpty(id)) {
+				convertJobDescriptionLists(id).then((res) => {
+					let html = stringToHtml(res);
+
+					if (html.hasChildNodes()) {
+						html.firstElementChild.remove();
+					}
+
+					// let header = html.getElementsByTagName('header');
+					// html.firstElementChild.removeChild(header);
+					block.parentElement.replaceWith(html);
+				});
+			}
+		});
+}
+addJobDescriptions();
+function convertMarkdownToHtml(text) {
+	// eslint-disable-next-line
+	const converter = new showdown.Converter();
+	return converter.makeHtml(text);
+}
 
 function setupDates() {
 	document.querySelectorAll('#block-jobs .notion-collection-list__item').forEach(function (job) {
@@ -283,9 +336,13 @@ function getElementCSSVariables(allCSSVars, element = document.body, pseudo) {
 }
 getAllCSSVariableNames('dark', true);
 function switchColorScheme(type) {
-	const colors = getAllCSSVariableNames(type, true);
+	let colors = getAllCSSVariableNames(type, true);
 
 	const styleNode = document.getElementById('color-sheme');
+	if (window.matchMedia('print')) {
+		colors = getAllCSSVariableNames('light', true);
+	}
+
 	let colorStyles = ':root{';
 	Object.entries(colors).forEach((entry) => {
 		let [cssVar, varVal] = entry;

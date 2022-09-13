@@ -6,6 +6,7 @@ module.exports = {
 		document: true,
 		window: true,
 		moment: true,
+		jQuery: true,
 	},
 	env: {
 		es2022: true,

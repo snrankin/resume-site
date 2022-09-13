@@ -140,23 +140,12 @@ $base-stacks: (
 	$font-families: map-set($font-families, $key, $font-map);
 }
 
-/* ------------------------------------*\
-    $FONT STACK MIXIN
-\*------------------------------------ */
-
-/**
- * Base font-family
- */
-$base-font-family: 'sans-serif' !default;
-$base-font-weight: 'regular' !default;
-$base-font-style: 'normal' !default; //Italic
-
 @function has-preload($font-type) {
-	@if not(map-has($font-families, $font-type)) and not(type-of(map-get($font-families, $font-type))) {
+	@if not(map-has-key($font-families, $font-type)) {
 		@error 'get( $map, $key ) there is no key #{$k} in map #{$i}.. #{print($m)} ';
 	} @else {
 		$font-settings: map-get($font-families, $font-type);
-		@if map-has($font-settings, 'preload') and type-of(map-get($font-settings, 'preload')) {
+		@if map-has-key($font-settings, 'preload') {
 			@return map-has($font-families, 'font-family');
 		}
 	}
@@ -283,7 +272,7 @@ $base-font-style: 'normal' !default; //Italic
 			}
 		}
 
-		@if map-has($font-type-map, 'extra') {
+		@if map-has-key($font-type-map, 'extra') {
 			@each $extra-style-prop, $extra-style-val in map-get($font-type-map, 'extra') {
 				@if $extra-style-prop == 'line-height' {
 					$font-final: map-set($font-final, $extra-style-prop, line-height($extra-style-val));
@@ -293,7 +282,7 @@ $base-font-style: 'normal' !default; //Italic
 			}
 		}
 
-		@if $fallback == true and map-has($font-type-map, 'preload') {
+		@if $fallback == true and map-has-key($font-type-map, 'preload') {
 			$font-preload: map-get($font-type-map, 'preload');
 			@each $prop, $val in $font-fallback {
 				@if $prop == 'line-height' {

@@ -10,9 +10,9 @@
     "scripts": {
         "build:all": "yarn build:dev && yarn build:prod",
         "build:debug": "webpack --cache --color --progress --stats verbose --node-env development",
-        "build:dev": "webpack --cache --color --progress --node-env development ",
-        "build:prod": "webpack --cache --color --progress --node-env production",
-        "build:html": "webpack --cache --color --progress --node-env development --config webpack.config.html.js ",
+        "build:dev": "webpack --cache --color --progress --stats errors-only --node-env development ",
+        "build:prod": "webpack --cache --color --progress --stats errors-only --node-env production",
+        "build:html": "webpack --cache --color --progress --stats errors-only --node-env development --config webpack.config.html.js ",
         "fix:all": "yarn fix:scripts && yarn fix:styles",
         "fix:scripts": "eslint 'src/**/*.js' --fix --color -f pretty --cache",
         "fix:styles": "stylelint 'src/**/*.{sass,scss,sss,less}' --fix --color --custom-formatter=node_modules/stylelint-formatter-pretty --cache",
@@ -20,7 +20,7 @@
         "lint:scripts": "eslint 'src/**/*.js' --color -f pretty --cache",
         "lint:styles": "stylelint 'src/**/*.{sass,scss,sss,less}' --color --custom-formatter=node_modules/stylelint-formatter-pretty --cache",
         "test": "webpack configtest",
-        "watch": "webpack --cache --color --progress --stats minimal --node-env development --watch"
+        "watch": "webpack --cache --color --progress --stats errors-only --node-env development --watch"
     },
     "engines": {
         "node": ">=14",
@@ -66,7 +66,6 @@
         "lodash": "^4.17.21",
         "mini-css-extract-plugin": "^2.6.1",
         "modularscale-sass": "^3.0.10",
-        "node-sass": "^7.0.1",
         "node-sass-magic-importer": "^5.3.2",
         "normalize-scss": "^7.0.1",
         "o-clock": "^0.1.2",
@@ -94,6 +93,7 @@
         "pretty-bytes": "^5.6.0",
         "printable-characters": "^1.0.42",
         "q-i": "^2.0.1",
+        "sass": "^1.54.9",
         "sass-loader": "~13.0.2",
         "serve": "^14.0.1",
         "stack-utils": "^2.0.5",
@@ -120,6 +120,8 @@
     },
     "dependencies": {
         "fs-extra": "^10.1.0",
-        "pretty-ms": "7.0.1"
+        "moment": "^2.29.4",
+        "pretty-ms": "7.0.1",
+        "showdown": "^2.1.0"
     }
 }

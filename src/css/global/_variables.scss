@@ -102,6 +102,9 @@ $gray-800 : #333333;
 $gray-900 : #191919;
 $black    : #000 ;
 
+$dark-contrast: $gray-900;
+$light-contrast: $white;
+
 // ================================ Light Mode ============================== //
 
 $red-light    : #e00000 ;
@@ -113,9 +116,20 @@ $purple-light : #9e04f1 ;
 $pink-light   : #fe0b85 ;
 
 $light-colors: (
+	red-hex: $red-light,
+	orange-hex: $orange-light,
+	yellow-hex: $yellow-light,
+	green-hex: $green-light,
+	blue-hex: $blue-light,
+	purple-hex: $purple-light,
+	pink-hex: $pink-light,
+);
+
+$light-color-vars: (
 	bg: $white,
 	text: $gray-900,
-	border: $gray-200
+	border: $gray-200,
+
 );
 
 $light-colors-hsl: (
@@ -167,9 +181,19 @@ $purple-dark : #c969fd;
 $pink-dark   : #fe40a0;
 
 $dark-colors: (
+red: $red-dark,
+	orange: $orange-dark,
+	yellow: $yellow-dark,
+	green: $green-dark,
+	blue: $blue-dark,
+	purple: $purple-dark,
+	pink: $pink-dark,
+);
+$dark-color-vars: (
 	bg: $gray-900,
 	text: $gray-100,
-	border: $gray-700
+	border: $gray-700,
+
 );
 
 $dark-colors-hsl: (

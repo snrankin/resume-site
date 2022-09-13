@@ -23,13 +23,31 @@
 		}
 	}
 
+	#block-4cac632d34224a96a4c512b410483a37 {
+		display: none;
+	}
+
 	.super-navbar,
 	.notion-header.page {
 		display: none;
 	}
 
-	.notion-root > * {
-		page-break-inside: avoid;
+	.notion-root {
+		> * {
+			page-break-inside: avoid;
+		}
+
+		> .node-code {
+			&:first-child {
+				display: none;
+			}
+
+			break-before: always;
+		}
+	}
+
+	.notion-table-of-contents {
+		display: none;
 	}
 
 	.super-content {

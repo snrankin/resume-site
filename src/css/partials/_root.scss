@@ -6,12 +6,6 @@
 /// @version   1.0.0
 /// ======================================================================== ///
 :root {
-	// // Note: Custom variable values only support SassScript inside `#{}`.
-
-	// // Colors
-	// //
-	// // Generate palettes for full colors, grays, and theme colors.
-
 	@each $color-name, $color-map in $light-colors-hsl {
 		@each $color-component, $value in $color-map {
 			--light-#{$color-name}-#{$color-component}: #{$value};
@@ -19,7 +13,16 @@
 	}
 
 	@each $color-name, $color in $light-colors {
+		--light-color-#{$color-name}: #{$color};
+		--light-color-bg-#{$color-name}: #{$color};
+		--light-color-pill-#{$color-name}: #{$color};
+		--light-color-pill-text-#{$color-name}: #{text-contrast($color)};
+		--light-color-#{$color-name}-contrast: #{text-contrast($color)};
+	}
+
+	@each $color-name, $color in $light-color-vars {
 		--light-color-#{$color-name}-default: #{$color};
+		--light-color-#{$color-name}-default-contrast: #{text-contrast($color)};
 	}
 
 	@each $color-name, $color-map in $dark-colors-hsl {
@@ -29,6 +32,38 @@
 	}
 
 	@each $color-name, $color in $dark-colors {
+		--dark-color-#{$color-name}: #{$color};
+		--dark-color-bg-#{$color-name}: #{$color};
+		--dark-color-pill-#{$color-name}: #{$color};
+		--dark-color-pill-text-#{$color-name}: #{text-contrast($color)};
+		--dark-color-#{$color-name}-contrast: #{text-contrast($color)};
+	}
+
+	@each $color-name, $color in $dark-color-vars {
 		--dark-color-#{$color-name}-default: #{$color};
+		--dark-color-#{$color-name}-default-contrast: #{text-contrast($color)};
+	}
+
+	--collection-card-cover-height-small: auto;
+
+	@media print {
+		@each $color-name, $color-map in $light-colors-hsl {
+			@each $color-component, $value in $color-map {
+				--#{$color-name}-#{$color-component}: #{$value} !important;
+			}
+		}
+
+		@each $color-name, $color in $light-colors {
+			--color-#{$color-name}: #{$color} !important;
+			--color-bg-#{$color-name}: #{$color} !important;
+			--color-pill-#{$color-name}: #{$color} !important;
+			--color-pill-text-#{$color-name}: #{text-contrast($color)} !important;
+			--color-#{$color-name}-contrast: #{text-contrast($color)} !important;
+		}
+
+		@each $color-name, $color in $light-color-vars {
+			--color-#{$color-name}-default: #{$color} !important;
+			--color-#{$color-name}-default-contrast: #{text-contrast($color)} !important;
+		}
 	}
 }

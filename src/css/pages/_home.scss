@@ -5,22 +5,11 @@
 /// @name   _home
 /// @version   1.0.0
 /// ======================================================================== ///
+///
 
-.notion-callout {
-	background-color: var(--color-text-default);
-	color: #fff;
-	font-family: var(--code-font);
-	display: inline-block;
-	width: auto;
-	line-height: lineheightex(1);
-
-	.notion-callout__content {
-		@include font-stack('code');
-
-		margin-inline-start: 0;
-		width: auto;
-		display: inline-block;
-		line-height: inherit;
+@media print {
+	.notion-root > .node-code:first-child {
+		display: none !important;
 	}
 }
 
@@ -49,8 +38,7 @@
 
 	.notion-column {
 		margin-inline-start: 0 !important;
-		padding-left: var(--grid-gap);
-		padding-right: var(--grid-gap);
+		padding: 0 var(--grid-gap);
 		border-bottom: var(--border-layout);
 
 		> h2.notion-heading {
@@ -80,6 +68,10 @@
 	}
 }
 
+.notion-collection-list__item[id*='block-skills'] {
+	@extend %remove-link;
+}
+
 #block-skills {
 	.notion-collection-list {
 		flex-flow: row wrap;
@@ -105,6 +97,22 @@
 		background-color: transparent;
 		color: unset;
 		font-size: var(--heading4-size);
+	}
+}
+
+#block-portfolio {
+	.notion-collection__header-wrapper {
+		display: none;
+	}
+
+	.notion-collection-card__cover.small {
+		&::before {
+			content: '';
+			display: block;
+			width: 100%;
+			padding-bottom: divide(16, 9);
+			aspect-ratio: 16 / 9;
+		}
 	}
 }
 

@@ -863,3 +863,19 @@
 
 	@return calc(#{$m * 100}vw #{$sign} #{$b});
 }
+
+/// Mixin that calculates if text needs to be light or dark depending on the
+/// background color passed.
+///
+/// @link https://codepen.io/davidhalford/pen/ALrbEP
+
+@function text-contrast($n) {
+	$color-brightness: round((red($n) * 299) + (green($n) * 587) + (blue($n) * 114) / 1000);
+	$light-color: round((red(#fff) * 299) + (green(#fff) * 587) + (blue(#fff) * 114) / 1000);
+
+	@if abs($color-brightness) < ($light-color/2) {
+		@return $light-contrast;
+	} @else {
+		@return $dark-contrast;
+	}
+}
